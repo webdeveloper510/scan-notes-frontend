@@ -116,9 +116,10 @@ const JWTAuth = {
     return async dispatch => {
       dispatch(fetchStart());
       try {
-        await axios.post('users/reset-request', { email });
+        const res = await axios.post('users/reset-request', { email });
         dispatch(setForgetPassMailSent(true));
         dispatch(fetchSuccess());
+        return res.data;
       } catch (error) {
         dispatch(fetchError(error.response?.data?.message || 'Failed to send reset email'));
       }
@@ -130,8 +131,9 @@ const JWTAuth = {
     return async dispatch => {
       dispatch(fetchStart());
       try {
-        await axios.post(`users/reset-password/${token}/`, { new_password, confirm_password });
+        const res = await axios.post(`users/reset-password/${token}/`, { new_password, confirm_password });
         dispatch(fetchSuccess());
+        return res.data;
       } catch (error) {
         dispatch(fetchError(error.response?.data?.message || 'Password reset failed'));
       }

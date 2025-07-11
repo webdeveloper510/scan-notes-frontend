@@ -67,12 +67,17 @@ const ResetPassword = ({ method = CurrentAuthMethod, variant = 'default', wrappe
     }
 
     try {
-      await dispatch(
+      const response = await dispatch(
         AuhMethods[method].onResetPassword({ token, new_password: newPassword, confirm_password: confirmPassword }),
       );
-      toast.success('Password reset successful!');
-      history.push('/signin');
+      if (response?.success === true) {
+        toast.success(response.message || 'Password reset successful!');
+        history.push('/signin');
+      } else {
+        toast.error(response?.message || 'Failed to reset password');
+      }
     } catch (error) {
+      console.error('Reset Password Error:', error);
       toast.error('Failed to reset password');
     }
   };
