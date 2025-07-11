@@ -14,7 +14,7 @@ import ContentLoader from '../../ContentLoader';
 import { CurrentAuthMethod } from '../../../constants/AppConstants';
 import AuthWrapper from './AuthWrapper';
 import toast from 'react-hot-toast';
-import { AuhMethods } from '../../../../services/auth'; // ← this is BasicAuth.js
+import { AuhMethods } from '../../../../services/auth';
 
 const useStyles = makeStyles(theme => ({
   authThumb: {
@@ -53,7 +53,6 @@ const ForgotPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapp
   const dispatch = useDispatch();
   const history = useHistory();
   const classes = useStyles({ variant });
-
   const [email, setEmail] = useState('');
 
   const handleEmailSubmit = async () => {
