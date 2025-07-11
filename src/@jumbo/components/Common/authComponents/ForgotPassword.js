@@ -62,8 +62,13 @@ const ForgotPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapp
     }
 
     try {
-      await dispatch(AuhMethods[method].onForgotPassword({ email }));
-      toast.success('Reset link sent to your email');
+      const response = await dispatch(AuhMethods[method].onForgotPassword({ email }));
+
+      if (response?.success) {
+        toast.success(response.message || 'Reset link sent to your email');
+      } else {
+        toast.error(response?.message || 'Failed to send reset email');
+      }
     } catch (err) {
       toast.error('Failed to send reset email');
     }

@@ -68,7 +68,9 @@ const ResetPassword = ({ method = CurrentAuthMethod, variant = 'default', wrappe
     }
 
     try {
-      await dispatch(AuhMethods[method].onResetPassword({ token, password: newPassword }));
+      await dispatch(
+        AuhMethods[method].onResetPassword({ token, new_password: newPassword, confirm_password: confirmPassword }),
+      );
       toast.success('Password reset successful!');
       history.push('/signin');
     } catch (error) {

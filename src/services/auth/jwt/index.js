@@ -116,7 +116,7 @@ const JWTAuth = {
     return async dispatch => {
       dispatch(fetchStart());
       try {
-        await axios.post('http://localhost:8000/reset-request', { email });
+        await axios.post('users/reset-request', { email });
         dispatch(setForgetPassMailSent(true));
         dispatch(fetchSuccess());
       } catch (error) {
@@ -126,11 +126,11 @@ const JWTAuth = {
   },
 
   // ✅ Reset New Password with token
-  onResetPassword: ({ token, password }) => {
+  onResetPassword: ({ token, new_password, confirm_password }) => {
     return async dispatch => {
       dispatch(fetchStart());
       try {
-        await axios.post(`http://localhost:8000/reset-password/${token}/`, { password });
+        await axios.post(`/reset-password/${token}/`, { new_password, confirm_password });
         dispatch(fetchSuccess());
       } catch (error) {
         dispatch(fetchError(error.response?.data?.message || 'Password reset failed'));
