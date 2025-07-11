@@ -3,7 +3,7 @@ import { Box, Button, Container, TextField, Typography, MenuItem } from '@materi
 import { makeStyles } from '@material-ui/core/styles';
 import IntlMessages from '@jumbo/utils/IntlMessages';
 import toast from 'react-hot-toast';
-
+import { contactSupport } from 'services/auth/Basic/api';
 const useStyles = makeStyles(theme => ({
   root: {
     minHeight: '100vh',
@@ -136,20 +136,38 @@ const ContactUs = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    toast.success('Message sent successfully!');
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      reason: '',
-      message: '',
-    });
-    setErrors({});
+    const payload = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email,
+      reason: formData.reason,
+      message: formData.message,
+    };
+
+    try {
+      const res = await contactSupport(payload);
+
+      if (res?.success == true) {
+        toast.success(res.message || 'Message sent successfully!');
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          reason: '',
+          message: '',
+        });
+        setErrors({});
+      } else {
+        toast.error(res.message || 'Failed to send message');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong');
+    }
   };
 
   return (
