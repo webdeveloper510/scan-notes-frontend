@@ -46,7 +46,6 @@ const useStyles = makeStyles(theme => ({
     },
   },
 }));
-
 const ResetPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapperVariant = 'default' }) => {
   const { token } = useParams();
   const dispatch = useDispatch();
