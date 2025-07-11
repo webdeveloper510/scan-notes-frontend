@@ -130,7 +130,7 @@ const JWTAuth = {
     return async dispatch => {
       dispatch(fetchStart());
       try {
-        await axios.post(`/reset-password/${token}/`, { new_password, confirm_password });
+        await axios.post(`/users/reset-password/${token}/`, { new_password, confirm_password });
         dispatch(fetchSuccess());
       } catch (error) {
         dispatch(fetchError(error.response?.data?.message || 'Password reset failed'));
