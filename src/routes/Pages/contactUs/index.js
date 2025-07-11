@@ -119,7 +119,6 @@ const ContactUs = () => {
       }));
     }
   };
-
   const validate = () => {
     const newErrors = {};
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
