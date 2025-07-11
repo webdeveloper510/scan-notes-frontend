@@ -15,7 +15,6 @@ import ReportBug from 'routes/Pages/reportBug';
 import ResetPassword from '@jumbo/components/Common/authComponents/ResetPassword';
 
 export const store = configureStore();
-
 const App = () => (
   <Provider store={store}>
     <ConnectedRouter history={history}>
