@@ -222,10 +222,10 @@ const ContactUs = () => {
             <MenuItem value="report">
               <IntlMessages id="contact.reason.report" />
             </MenuItem>
-            <MenuItem value="billing">
+            <MenuItem value="billing/subscription">
               <IntlMessages id="contact.reason.billing" />
             </MenuItem>
-            <MenuItem value="suggestion">
+            <MenuItem value="suggestion/idea">
               <IntlMessages id="contact.reason.suggestion" />
             </MenuItem>
             <MenuItem value="other">
