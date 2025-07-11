@@ -35,7 +35,6 @@ const JWTAuth = {
         });
     };
   },
-
   onLogin: ({ email, password }) => {
     return dispatch => {
       try {
