@@ -59,11 +59,11 @@ const useStyles = makeStyles(theme => ({
   enlargedImage: {
     position: 'absolute',
     display: 'none',
-    width: 200 /* Adjust the width as per your requirement */,
-    height: 200 /* Adjust the height as per your requirement */,
-    border: '2px solid #ccc' /* Add any desired border styles */,
-    backgroundColor: 'white' /* Set the background color of the enlarged image area */,
-    pointerEvents: 'none' /* Allow mouse events to pass through the enlarged image area */,
+    width: 200,
+    height: 200,
+    border: '2px solid #ccc',
+    backgroundColor: 'white',
+    pointerEvents: 'none',
     backgroundRepeat: 'no-repeat',
   },
 }));
@@ -115,8 +115,6 @@ const DashBoard = props => {
       const mouseY = event.clientY;
       const rect = imageContainer.getBoundingClientRect();
       const canvas_rect = myCanvas.getBoundingClientRect();
-
-      // Set the position of the enlarged image container
       enlargedImage.style.top = `${mouseY - rect.top - 100 + imageContainer.scrollTop}px`;
       enlargedImage.style.left = `${mouseX - rect.left - 100 + imageContainer.scrollLeft}px`;
       enlargedImage.style.display = 'block';
@@ -126,29 +124,43 @@ const DashBoard = props => {
       enlargedImage.style.backgroundPositionX = `${-(mouseX - canvas_rect.left - 100)}px`;
       enlargedImage.style.backgroundPositionY = `${-(mouseY - canvas_rect.top - 100)}px`;
     });
-
-    // Register the mouseout event listener
     imageContainer.addEventListener('mouseout', function() {
-      // Hide the enlarged image container when the mouse moves out
       enlargedImage.style.display = 'none';
     });
     if (photo_img) handleFileInputChange(photo_img);
   }, []);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const img = new Image();
+
     img.onload = function() {
-      const fixedWidth = 200;
-      const fixedHeight = 200;
-      canvas.width = fixedWidth;
-      canvas.height = fixedHeight;
-      ctx.drawImage(img, 0, 0, fixedWidth, fixedHeight);
+      const originalWidth = img.naturalWidth || img.width;
+      const originalHeight = img.naturalHeight || img.height;
+      const maxWidth = 1800;
+      const maxHeight = 1200;
+
+      let canvasWidth = originalWidth;
+      let canvasHeight = originalHeight;
+      if (originalWidth > maxWidth || originalHeight > maxHeight) {
+        const widthRatio = maxWidth / originalWidth;
+        const heightRatio = maxHeight / originalHeight;
+        const ratio = Math.min(widthRatio, heightRatio);
+
+        canvasWidth = originalWidth * ratio;
+        canvasHeight = originalHeight * ratio;
+      }
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
     };
+
     img.src = photo_img_url;
   }, [photo_img_url]);
-
   const handleSubmitClick = () => {
     if (!photo_img) {
       setMessage('You need to select the image.');
@@ -214,7 +226,7 @@ const DashBoard = props => {
       setCurrentPage(pageNumber);
 
       const page = await pdf.getPage(pageNumber);
-      const scale = 2;
+      const scale = 3;
       const viewport = page.getViewport({ scale });
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
@@ -229,7 +241,7 @@ const DashBoard = props => {
 
       await page.render(renderContext).promise;
 
-      const dataURL = canvas.toDataURL('image/jpeg');
+      const dataURL = canvas.toDataURL('image/png');
       setPhotoImgUrl(dataURL);
     } catch (error) {
       dispatch(fetchError(`Error loading PDF: ${error}`));
@@ -253,29 +265,22 @@ const DashBoard = props => {
 
   const handleFileInputChange = fileObj => {
     if (fileObj && fileObj.type === 'application/pdf') {
-      // The file is a PDF
       setPhotoImg(fileObj);
       loadPdfFile(fileObj, 1);
     } else if (fileObj && fileObj.type.startsWith('image/')) {
-      // The file is an image
       setPhotoImg(fileObj);
       setNumPages(0);
       setCurrentPage(1);
       loadImageFile(fileObj);
-
-      // Create a new image object to store in selectedImageURL
       const newImage = {
         id: selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1,
-        image: URL.createObjectURL(fileObj), // Create a URL for the uploaded image
+        image: URL.createObjectURL(fileObj),
         file: fileObj,
         source: undefined,
         solution: undefined,
       };
-
-      // Update the selectedImageURL state with the new image
       setSelectedImageURL(prevImages => [...prevImages, newImage]);
     } else {
-      // The file is not a PDF or an image
       dispatch(fetchError('Invalid file format'));
     }
     fileObj = null;
@@ -338,23 +343,17 @@ const DashBoard = props => {
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-
-    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the original image
     const img = new Image();
+    img.onload = function() {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const width = endX - startX;
+      const height = endY - startY;
+      ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(startX, startY, width, height);
+    };
     img.src = photo_img_url;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    // Draw the selected rectangular area
-
-    const width = endX - startX;
-    const height = endY - startY;
-    ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
-    ctx.lineWidth = 2;
-
-    ctx.strokeRect(startX, startY, width, height);
   };
 
   const extractSelectedArea = () => {
@@ -365,19 +364,10 @@ const DashBoard = props => {
 
       const width = endX - startX;
       const height = endY - startY;
-
-      // Set the dimensions of the temporary canvas
       tempCanvas.width = width;
       tempCanvas.height = height;
-
-      // Draw the selected area onto the temporary canvas
       tempCtx.drawImage(canvas, startX, startY, width, height, 0, 0, width, height);
-
-      // Return the data URL of the extracted image
-
       const blob = dataURLtoBlob(tempCanvas.toDataURL('image/png'));
-
-      // Create a new File object from the Blob
       const file = new File([blob], 'image.png', { type: 'image/png' });
 
       const new_id = selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1;
@@ -413,7 +403,7 @@ const DashBoard = props => {
       return new Blob([arrayBuffer], { type: contentType });
     } catch (error) {
       console.error('Error decoding base64 string:', error);
-      return null; // or handle the error in an appropriate way
+      return null;
     }
   };
 
@@ -592,13 +582,16 @@ const DashBoard = props => {
                                   <CmtImage
                                     id={`second_image${img.id}`}
                                     src={img.image}
-                                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                    style={{
+                                      width: '80px',
+                                      height: '80px',
+                                      objectFit: 'cover',
+                                      border: '1px solid #ddd',
+                                      borderRadius: '4px',
+                                    }}
                                   />
                                   {currentMidi && currentMidi === img.id ? (
-                                    <audio
-                                      src={`${mediaURL}${img.source}`}
-                                      controls
-                                      autoPlay={img.id === currentMidi}></audio>
+                                    <audio src={`${mediaURL}${img.source}`} controls autoPlay={img.id === currentMidi} />
                                   ) : null}
                                 </div>
                               </TableCell>
@@ -706,7 +699,7 @@ const DashBoard = props => {
                   onChange={event => handleFileInputChange(event.target.files[0])}
                 />
                 <div
-                  style={{ width: '100%', height: '800px', overflow: 'auto' }}
+                  style={{ width: '100%', maxHeight: '800px', overflow: 'auto', display: 'flex', justifyContent: 'center' }}
                   className={clsx(classes.imageContainer)}
                   id="image-container">
                   <canvas
@@ -714,7 +707,7 @@ const DashBoard = props => {
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
-                    style={{ height: '500', width: '500', left: 0, top: 0 }}
+                    style={{ maxWidth: '100%', height: 'auto', left: 0, top: 0 }}
                     id="myCanvas"
                   />
                   <div className={clsx(classes.enlargedImage)} id="enlarged-image"></div>
