@@ -48,7 +48,6 @@ const useStyles = makeStyles(theme => ({
     },
   },
 }));
-
 const ForgotPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapperVariant = 'default' }) => {
   const dispatch = useDispatch();
   const history = useHistory();
