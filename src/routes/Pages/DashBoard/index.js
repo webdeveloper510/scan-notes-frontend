@@ -371,25 +371,35 @@ const DashBoard = props => {
     enlargedImage.style.display = 'none';
   };
 
-  const handleMouseUp = () => {
-    const enlargedImage = document.querySelector('#enlarged-image');
 
-    if (!zoomFocus) {
-      enlargedImage.style.display = 'none';
-    } else {
-      enlargedImage.style.display = 'block';
-    }
+const handleMouseUp = () => {
+  const enlargedImage = document.querySelector('#enlarged-image');
 
-    setIsDragging(false);
-    redrawCanvas();
+  if (!zoomFocus) {
+    enlargedImage.style.display = 'none';
+  } else {
+    enlargedImage.style.display = 'block';
+  }
+
+  setIsDragging(false);
+  redrawCanvas();
+  
+  // Only extract if there's a meaningful selection (minimum 10x10 pixels)
+  const width = Math.abs(endX - startX);
+  const height = Math.abs(endY - startY);
+  
+  if (width > 10 && height > 10) {
     extractSelectedArea();
-    try {
-      const canvas = canvasRef.current;
-      enlargedImage.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg')})`;
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }
+  
+  try {
+    const canvas = canvasRef.current;
+    enlargedImage.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg')})`;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
@@ -407,19 +417,38 @@ const DashBoard = props => {
     img.src = photo_img_url;
   };
 
-  const extractSelectedArea = () => {
-    try {
-      const canvas = canvasRef.current;
+const extractSelectedArea = () => {
+  try {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const tempFullCanvas = document.createElement('canvas');
+    const tempFullCtx = tempFullCanvas.getContext('2d');
+    tempFullCanvas.width = canvas.width;
+    tempFullCanvas.height = canvas.height;
+    
+    const img = new Image();
+    img.onload = function() {
+      tempFullCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const width = Math.abs(endX - startX);
+      const height = Math.abs(endY - startY);
+      if (width <= 0 || height <= 0) {
+        return;
+      }
+      const startXPos = Math.min(startX, endX);
+      const startYPos = Math.min(startY, endY);
+      
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
-
-      const width = endX - startX;
-      const height = endY - startY;
       tempCanvas.width = width;
       tempCanvas.height = height;
-      tempCtx.drawImage(canvas, startX, startY, width, height, 0, 0, width, height);
-      const blob = dataURLtoBlob(tempCanvas.toDataURL('image/png'));
-      const file = new File([blob], 'image.png', { type: 'image/png' });
+      
+      tempCtx.drawImage(tempFullCanvas, startXPos, startYPos, width, height, 0, 0, width, height);
+      
+      const dataURL = tempCanvas.toDataURL('image/png');
+      const blob = dataURLtoBlob(dataURL);
+      const file = new File([blob], 'selected_area.png', { type: 'image/png' });
 
       const new_id = selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1;
 
@@ -427,17 +456,20 @@ const DashBoard = props => {
         ...prevImages,
         {
           id: new_id,
-          image: tempCanvas.toDataURL('image/png'),
+          image: dataURL,
           file: file,
           source: undefined,
           solution: undefined,
         },
       ]);
       setGotoDetail(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    };
+    
+    img.src = photo_img_url;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   const dataURLtoBlob = dataURL => {
     const parts = dataURL.split(';base64,');
