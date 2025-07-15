@@ -719,7 +719,7 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
                                 <CmtImage
                                   src={img.image}
                                   style={{
-                                    width: '60px',
+                                    // width: '60px',
                                     height: '60px',
                                     objectFit: 'cover',
                                     border: '1px solid #ddd',
