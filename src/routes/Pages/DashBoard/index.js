@@ -541,7 +541,6 @@ const extractSelectedArea = () => {
           console.log(error);
         }
       };
-
       if (!isImageLoading) {
         isImageLoading = true;
 
