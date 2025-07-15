@@ -703,7 +703,6 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
                 </IconButton>
               </div>
             </Grid>
-
             {/* Main content with side-by-side layout */}
             <Grid item xs={12}>
               <div className={classes.mainLayout}>
