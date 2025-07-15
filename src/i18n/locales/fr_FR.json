@@ -1,5 +1,5 @@
 {
-  "sidebar.main": "Principale",
+  "sidebar.main": "Accueil",
   "sidebar.dashboards": "Tableaux de bord",
   "sidebar.dashboard": "Tableau de bord",
   "sidebar.dashboard.misc": "Divers",
@@ -697,5 +697,11 @@
   "contact.reason.report": "Signaler un dysfonctionnement",
   "contact.reason.billing": "Facturation / Abonnement",
   "contact.reason.suggestion": "Suggestion / Idée",
-  "contact.reason.other": "Autre"
+  "contact.reason.other": "Autre",
+  "dashboard.upload": "Télécharger une image/PDF",
+"dashboard.scan": "Scanner",
+"dashboard.sheet": "Partition musicale",
+"dashboard.submit": "Soumettre",
+"dashboard.goto": "Aller aux détails"
+
 }

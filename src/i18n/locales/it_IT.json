@@ -697,5 +697,11 @@
   "contact.reason.report": "Segnala un malfunzionamento",
   "contact.reason.billing": "Fatturazione / abbonamento",
   "contact.reason.suggestion": "Suggerimento / idea",
-  "contact.reason.other": "Altro"
+  "contact.reason.other": "Altro",
+  "dashboard.upload": "Carica immagine/PDF",
+  "dashboard.scan": "Scansiona",
+  "dashboard.sheet": "Spartito musicale",
+  "dashboard.submit": "Invia",
+"dashboard.goto": "Vai ai dettagli"
+
 }

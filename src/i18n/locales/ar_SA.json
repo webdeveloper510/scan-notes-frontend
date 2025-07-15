@@ -1,5 +1,5 @@
 {
-  "sidebar.main": "الأساسية",
+ "sidebar.main": "الرئيسية",
   "sidebar.dashboards": "لوحة القيادة",
   "sidebar.dashboard": "لوحة القيادة",
   "sidebar.dashboard.misc": "افتراضي",
@@ -698,5 +698,11 @@
   "contact.reason.report": "الإبلاغ عن خلل",
   "contact.reason.billing": "الفوترة / الاشتراك",
   "contact.reason.suggestion": "اقتراح / فكرة",
-  "contact.reason.other": "أخرى"
+  "contact.reason.other": "أخرى",
+  "dashboard.upload": "تحميل صورة / ملف PDF",
+  "dashboard.scan": "مسح",
+  "dashboard.sheet": "النوتة الموسيقية",
+  "dashboard.submit": "إرسال",
+"dashboard.goto": "اذهب إلى التفاصيل"
+
 }

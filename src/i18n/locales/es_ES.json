@@ -697,5 +697,11 @@
   "contact.reason.report": "Reportar un fallo",
   "contact.reason.billing": "Facturación / suscripción",
   "contact.reason.suggestion": "Sugerencia / Idea",
-  "contact.reason.other": "Otro"
+  "contact.reason.other": "Otro",
+  "dashboard.upload": "Subir imagen/PDF",
+  "dashboard.scan": "Escanear",
+  "dashboard.sheet": "Partitura",
+  "dashboard.submit": "Enviar",
+"dashboard.goto": "Ir al detalle"
+
 }

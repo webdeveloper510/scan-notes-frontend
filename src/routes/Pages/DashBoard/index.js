@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogActions,
   makeStyles,
+  Typography,
 } from '@material-ui/core';
 import {
   Delete,
@@ -66,6 +67,57 @@ const useStyles = makeStyles(theme => ({
     pointerEvents: 'none',
     backgroundRepeat: 'no-repeat',
   },
+
+  mainLayout: {
+    display: 'flex',
+    gap: theme.spacing(1),
+    height: '100%',
+    alignItems: 'flex-start',
+  },
+  canvasSection: {
+    flex: 1,
+    minWidth: 0,
+    marginTop: '-20px',
+    marginLeft: theme.spacing(1),
+  },
+  selectedImagesSection: {
+    width: '400px',
+    minWidth: '400px',
+    maxHeight: '800px',
+    overflow: 'auto',
+    order: -1,
+    marginTop: '10px',
+  },
+  selectedImageItem: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: theme.spacing(1),
+    padding: theme.spacing(1),
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    backgroundColor: '#f9f9f9',
+  },
+  selectedImageThumbnail: {
+    marginRight: theme.spacing(1),
+  },
+  selectedImageActions: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginLeft: 'auto',
+  },
+  selectedImageSolution: {
+    flex: 1,
+    marginLeft: theme.spacing(1),
+    fontSize: '0.875rem',
+  },
+  controlsSection: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+    marginBottom: theme.spacing(2),
+  },
 }));
 
 const DashBoard = props => {
@@ -96,7 +148,7 @@ const DashBoard = props => {
   const [open_scan, setOpenScan] = useState(false);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentMidi, setCurrentMidi] = useState(0);
+  const [currentMidi, setCurrentMidi] = useState(null);
   const [gotoDetail, setGotoDetail] = useState(props.location.state && props.location.state.photo_img ? true : false);
   const History = useHistory();
   const [scale, setScale] = useState(1);
@@ -118,9 +170,6 @@ const DashBoard = props => {
       enlargedImage.style.top = `${mouseY - rect.top - 100 + imageContainer.scrollTop}px`;
       enlargedImage.style.left = `${mouseX - rect.left - 100 + imageContainer.scrollLeft}px`;
       enlargedImage.style.display = 'block';
-      // if (photo_img_url != 'https://via.placeholder.com/600x400')
-      //   enlargedImage.style.backgroundImage = `url(${myCanvas.toDataURL('image/jpeg')})`;
-      // Set the content of the enlarged image container
       enlargedImage.style.backgroundPositionX = `${-(mouseX - canvas_rect.left - 100)}px`;
       enlargedImage.style.backgroundPositionY = `${-(mouseY - canvas_rect.top - 100)}px`;
     });
@@ -129,6 +178,7 @@ const DashBoard = props => {
     });
     if (photo_img) handleFileInputChange(photo_img);
   }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -161,6 +211,7 @@ const DashBoard = props => {
 
     img.src = photo_img_url;
   }, [photo_img_url]);
+
   const handleSubmitClick = () => {
     if (!photo_img) {
       setMessage('You need to select the image.');
@@ -372,13 +423,16 @@ const DashBoard = props => {
 
       const new_id = selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1;
 
-      selectedImageURL.push({
-        id: new_id,
-        image: tempCanvas.toDataURL('image/png'),
-        file: file,
-        source: undefined,
-        solution: undefined,
-      });
+      setSelectedImageURL(prevImages => [
+        ...prevImages,
+        {
+          id: new_id,
+          image: tempCanvas.toDataURL('image/png'),
+          file: file,
+          source: undefined,
+          solution: undefined,
+        },
+      ]);
       setGotoDetail(false);
     } catch (error) {
       console.log(error);
@@ -418,7 +472,7 @@ const DashBoard = props => {
   };
 
   const handlePlayMidi = id => {
-    if (currentMidi == id) {
+    if (currentMidi === id) {
       setCurrentMidi(0);
     } else {
       setCurrentMidi(id);
@@ -519,7 +573,7 @@ const DashBoard = props => {
             isImageLoading = false;
             const imageContainer = document.querySelector('#image-container');
             const fullWidth = imageContainer.clientWidth;
-            const new_scale = (new_scale * fullWidth) / canvas.width;
+            const new_scale = (scale * fullWidth) / canvas.width;
             canvas.width = fullWidth;
             canvas.height = (fullWidth * image.height) / image.width;
 
@@ -567,170 +621,170 @@ const DashBoard = props => {
       <GridContainer>
         <Grid item xs={12}>
           <GridContainer>
-            <Grid item xs={12} sm={12} md={12}>
-              <CmtCard>
-                <CmtCardHeader title="Selected Image" className="pt-4"></CmtCardHeader>
-                <CmtCardContent>
-                  <PerfectScrollbar>
-                    <Box className="Cmt-table-responsive">
-                      <Table>
-                        <TableBody>
+            {/* Control buttons */}
+            <Grid item xs={12}>
+              <div className={classes.controlsSection}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={e => {
+                    document.getElementById('photo_img').click();
+                  }}
+                  disabled={loading}
+                  startIcon={<CloudUpload />}>
+                  {<IntlMessages id="dashboard.upload" />}
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleScanButtonClick()}
+                  disabled={loading}
+                  startIcon={<PhotoCamera />}>
+                  {<IntlMessages id="dashboard.scan" />}
+                </Button>
+                <IconButton color="secondary" onClick={() => handleZoomInClick()}>
+                  <ZoomIn />
+                </IconButton>
+                <IconButton color="secondary" onClick={() => handleZoomOutClick()}>
+                  <ZoomOut />
+                </IconButton>
+                <IconButton color="secondary" onClick={() => handleZoomOutMapClick()}>
+                  <ZoomOutMap />
+                </IconButton>
+                <IconButton color={zoomFocus ? 'secondary' : 'primary'} onClick={() => handleZoomFocusClick()}>
+                  <CenterFocusStrong />
+                </IconButton>
+              </div>
+            </Grid>
+
+            {/* Main content with side-by-side layout */}
+            <Grid item xs={12}>
+              <div className={classes.mainLayout}>
+                {/* Selected images section - now on the left */}
+                <div className={classes.selectedImagesSection}>
+                  {selectedImageURL.length > 0 && (
+                    <CmtCard>
+                      <CmtCardContent>
+                        <PerfectScrollbar>
                           {selectedImageURL.map(img => (
-                            <TableRow key={img.id}>
-                              <TableCell>
-                                <div className="jr-card-thumb">
-                                  <CmtImage
-                                    id={`second_image${img.id}`}
-                                    src={img.image}
-                                    style={{
-                                      width: '80px',
-                                      height: '80px',
-                                      objectFit: 'cover',
-                                      border: '1px solid #ddd',
-                                      borderRadius: '4px',
-                                    }}
+                            <div key={img.id} className={classes.selectedImageItem}>
+                              <div className={classes.selectedImageThumbnail}>
+                                <CmtImage
+                                  src={img.image}
+                                  style={{
+                                    width: '60px',
+                                    height: '60px',
+                                    objectFit: 'cover',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                  }}
+                                />
+                              </div>
+                              <div className={classes.selectedImageSolution}>
+                                {img.solution ? (
+                                  <Typography variant="body2">{img.solution}</Typography>
+                                ) : (
+                                  <Typography variant="body2" color="textSecondary"></Typography>
+                                )}
+                                {currentMidi && currentMidi === img.id && img.source && (
+                                  <audio
+                                    src={`${mediaURL}${img.source}`}
+                                    controls
+                                    autoPlay={img.id === currentMidi}
+                                    style={{ width: '100%', marginTop: '8px' }}
                                   />
-                                  {currentMidi && currentMidi === img.id ? (
-                                    <audio src={`${mediaURL}${img.source}`} controls autoPlay={img.id === currentMidi} />
-                                  ) : null}
-                                </div>
-                              </TableCell>
-                              <TableCell style={{ padding: '0px' }}>
-                                {img.source ? (
-                                  <IconButton
-                                    style={{ marginLeft: 4 }}
-                                    color="secondary"
-                                    onClick={() => handlePlayMidi(img.id)}>
+                                )}
+                              </div>
+                              <div className={classes.selectedImageActions}>
+                                {img.source && (
+                                  <IconButton size="small" color="primary" onClick={() => handlePlayMidi(img.id)}>
                                     {img.id === currentMidi ? <Stop /> : <PlayArrow />}
                                   </IconButton>
-                                ) : null}
-                              </TableCell>
-                              <TableCell>{img.solution ? img.solution : ''}</TableCell>
-                              <TableCell style={{ padding: '0px' }}>
-                                <IconButton
-                                  style={{ marginLeft: 4 }}
-                                  color="secondary"
-                                  onClick={() => handleDeleteImage(img.id)}>
+                                )}
+                                <IconButton size="small" color="secondary" onClick={() => handleDeleteImage(img.id)}>
                                   <Delete />
                                 </IconButton>
-                              </TableCell>
-                            </TableRow>
+                              </div>
+                            </div>
                           ))}
-                        </TableBody>
-                      </Table>
-                    </Box>
-                  </PerfectScrollbar>
-                  <Box mt={4}>
-                    <GridContainer>
-                      <Grid item xs={6} style={{ textAlign: 'center' }}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleSubmitClick}
-                          disabled={loading || selectedImageURL.length == 0}
-                          startIcon={<Send />}>
-                          Submit
-                        </Button>
-                      </Grid>
-                      <Grid item xs={6} style={{ textAlign: 'center' }}>
-                        <Button variant="contained" color="primary" onClick={handleGotoDetailClick} disabled={!gotoDetail}>
-                          Go to Detail
-                        </Button>
-                      </Grid>
-                    </GridContainer>
-                  </Box>
-                </CmtCardContent>
-              </CmtCard>
-            </Grid>
-            <Grid item xs={4} style={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={e => {
-                  document.getElementById('photo_img').click();
-                }}
-                disabled={loading}
-                startIcon={<CloudUpload />}>
-                Upload Image/PDF
-              </Button>
-            </Grid>
-            <Grid item xs={4} style={{ textAlign: 'center' }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleScanButtonClick()}
-                disabled={loading}
-                startIcon={<PhotoCamera />}>
-                Scan
-              </Button>
-            </Grid>
-            <Grid item xs={4} style={{ textAlign: 'center' }}>
-              <IconButton style={{ marginLeft: 4 }} color="secondary" onClick={() => handleZoomInClick()}>
-                <ZoomIn />
-              </IconButton>
-              <IconButton style={{ marginLeft: 4 }} color="secondary" onClick={() => handleZoomOutClick()}>
-                <ZoomOut />
-              </IconButton>
-              <IconButton style={{ marginLeft: 4 }} color="secondary" onClick={() => handleZoomOutMapClick()}>
-                <ZoomOutMap />
-              </IconButton>
-              <IconButton
-                style={{ marginLeft: 4 }}
-                color={zoomFocus ? 'secondary' : 'primary'}
-                onClick={() => handleZoomFocusClick()}>
-                <CenterFocusStrong />
-              </IconButton>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Box mb={6} style={{ textAlign: 'center' }}>
-                {/* <div className="jr-card-thumb">
-                  <CmtImage
-                    src={photo_img_url}
-                    alt={'photo image'}
-                    style={{ height: '100%', width: '100%', objectFit: 'cover' }}
-                  />
-                </div> */}
-                <div className="d-flex justify-content-center mt-2">Sheet Music</div>
-                <input
-                  type="file"
-                  id="photo_img"
-                  name="photo_img"
-                  style={{ display: 'none' }}
-                  onChange={event => handleFileInputChange(event.target.files[0])}
-                />
-                <div
-                  style={{ width: '100%', maxHeight: '800px', overflow: 'auto', display: 'flex', justifyContent: 'center' }}
-                  className={clsx(classes.imageContainer)}
-                  id="image-container">
-                  <canvas
-                    ref={canvasRef}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    style={{ maxWidth: '100%', height: 'auto', left: 0, top: 0 }}
-                    id="myCanvas"
-                  />
-                  <div className={clsx(classes.enlargedImage)} id="enlarged-image"></div>
+                        </PerfectScrollbar>
+                        <Box mt={2}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            fullWidth
+                            onClick={handleSubmitClick}
+                            disabled={loading || selectedImageURL.length === 0}
+                            startIcon={<Send />}
+                            style={{ marginBottom: '8px' }}>
+                            {<IntlMessages id="dashboard.submit" />}
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            fullWidth
+                            onClick={handleGotoDetailClick}
+                            disabled={!gotoDetail}>
+                            {<IntlMessages id="dashboard.goto" />}
+                          </Button>
+                        </Box>
+                      </CmtCardContent>
+                    </CmtCard>
+                  )}
                 </div>
-                {numPages ? (
-                  <Box mt={4}>
-                    <Button variant="contained" size="small" color="secondary" className="mr-3" onClick={handlePrevClick}>
-                      Prev
-                    </Button>
-                    <span>
-                      Page {currentPage} of {numPages}
-                    </span>
-                    <Button variant="contained" size="small" color="secondary" className="ml-3" onClick={handleNextClick}>
-                      Next
-                    </Button>
+                {/* Canvas section - now on the right */}
+                <div className={classes.canvasSection}>
+                  <Box mb={2} style={{ textAlign: 'center' }}>
+                    <Typography variant="h6">Sheet Music</Typography>
                   </Box>
-                ) : null}
-                {/* <button onClick={handleCropButtonClick}>Crop Image</button> */}
-              </Box>
+                  <input
+                    type="file"
+                    id="photo_img"
+                    name="photo_img"
+                    style={{ display: 'none' }}
+                    onChange={event => handleFileInputChange(event.target.files[0])}
+                  />
+                  <div
+                    style={{
+                      width: '100%',
+                      maxHeight: '800px',
+                      overflow: 'auto',
+                      display: 'flex',
+                      justifyContent: 'flex-start',
+                      marginTop: '10px',
+                    }}
+                    className={clsx(classes.imageContainer)}
+                    id="image-container">
+                    <canvas
+                      ref={canvasRef}
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onMouseUp={handleMouseUp}
+                      style={{ maxWidth: '100%', height: 'auto', left: 0, top: 0, marginLeft: '8px' }}
+                      id="myCanvas"
+                    />
+                    <div className={clsx(classes.enlargedImage)} id="enlarged-image"></div>
+                  </div>
+                  {numPages ? (
+                    <Box mt={2} style={{ textAlign: 'center' }}>
+                      <Button variant="contained" size="small" color="secondary" onClick={handlePrevClick}>
+                        Prev
+                      </Button>
+                      <span style={{ margin: '0 16px' }}>
+                        Page {currentPage} of {numPages}
+                      </span>
+                      <Button variant="contained" size="small" color="secondary" onClick={handleNextClick}>
+                        Next
+                      </Button>
+                    </Box>
+                  ) : null}
+                </div>
+              </div>
             </Grid>
           </GridContainer>
         </Grid>
       </GridContainer>
+
       <Dialog fullScreen={fullScreen} open={open_scan} onClose={handleScanClose} aria-labelledby="responsive-dialog-title">
         <DialogTitle id="responsive-dialog-title">{'Take a sheet music with a camera'}</DialogTitle>
         <DialogContent>

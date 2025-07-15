@@ -697,5 +697,11 @@
   "contact.reason.report": "报告问题",
   "contact.reason.billing": "账单 / 订阅",
   "contact.reason.suggestion": "建议 / 想法",
-  "contact.reason.other": "其他"
+  "contact.reason.other": "其他",
+  "dashboard.upload": "上传图片/PDF",
+  "dashboard.scan": "扫描",
+  "dashboard.sheet": "乐谱",
+  "dashboard.submit": "提交",
+"dashboard.goto": "查看详情"
+
 }
