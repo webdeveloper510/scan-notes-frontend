@@ -179,39 +179,38 @@ const DashBoard = props => {
     if (photo_img) handleFileInputChange(photo_img);
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
+useEffect(() => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
 
-    img.onload = function() {
-      const originalWidth = img.naturalWidth || img.width;
-      const originalHeight = img.naturalHeight || img.height;
-      const maxWidth = 1800;
-      const maxHeight = 1200;
+  img.onload = function() {
+    const originalWidth = img.naturalWidth || img.width;
+    const originalHeight = img.naturalHeight || img.height;
+    const maxWidth = 1800;
+    const maxHeight = 1200;
 
-      let canvasWidth = originalWidth;
-      let canvasHeight = originalHeight;
-      if (originalWidth > maxWidth || originalHeight > maxHeight) {
-        const widthRatio = maxWidth / originalWidth;
-        const heightRatio = maxHeight / originalHeight;
-        const ratio = Math.min(widthRatio, heightRatio);
+    let canvasWidth = originalWidth;
+    let canvasHeight = originalHeight;
+    if (originalWidth > maxWidth || originalHeight > maxHeight) {
+      const widthRatio = maxWidth / originalWidth;
+      const heightRatio = maxHeight / originalHeight;
+      const ratio = Math.min(widthRatio, heightRatio);
 
-        canvasWidth = originalWidth * ratio;
-        canvasHeight = originalHeight * ratio;
-      }
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
+      canvasWidth = originalWidth * ratio;
+      canvasHeight = originalHeight * ratio;
+    }
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
 
-      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-    };
+  };
 
-    img.src = photo_img_url;
-  }, [photo_img_url]);
-
+  img.src = photo_img_url;
+}, [photo_img_url]);
   const handleSubmitClick = () => {
     if (!photo_img) {
       setMessage('You need to select the image.');
@@ -337,136 +336,157 @@ const DashBoard = props => {
     fileObj = null;
   };
 
-  const handleMouseDown = e => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+const handleMouseDown = e => {
+  const canvas = canvasRef.current;
+  const rect = canvas.getBoundingClientRect();
+  
+  // Get mouse position relative to the canvas element (not the canvas coordinate system)
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-    setIsDragging(true);
-    setStartX(x);
-    setStartY(y);
-    setEndX(x);
-    setEndY(y);
-  };
-
-  const handleMouseMove = e => {
-    const enlargedImage = document.querySelector('#enlarged-image');
-
+  setIsDragging(true);
+  setStartX(x);
+  setStartY(y);
+  setEndX(x);
+  setEndY(y);
+};
+const handleMouseMove = e => {
+  const enlargedImage = document.querySelector('#enlarged-image');
+  const canvas = canvasRef.current;
+  const rect = canvas.getBoundingClientRect();
+  
+  // Get current mouse position relative to canvas element
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  // Handle zoom focus display logic (only when not dragging)
+  if (!isDragging) {
     if (!zoomFocus) {
       enlargedImage.style.display = 'none';
     } else {
       enlargedImage.style.display = 'block';
     }
-    if (!isDragging) return;
-
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
+  } else {
+    // Hide enlarged image while dragging
+    enlargedImage.style.display = 'none';
+  }
+  
+  // Handle drag selection
+  if (isDragging) {
     setEndX(x);
     setEndY(y);
     redrawCanvas();
-    enlargedImage.style.display = 'none';
-  };
-
-
+  }
+};
 const handleMouseUp = () => {
   const enlargedImage = document.querySelector('#enlarged-image');
-
-  if (!zoomFocus) {
-    enlargedImage.style.display = 'none';
-  } else {
+  
+  if (isDragging) {
+    setIsDragging(false);
+    
+    // Calculate the selection area in canvas element coordinates
+    const actualStartX = Math.min(startX, endX);
+    const actualStartY = Math.min(startY, endY);
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
+    
+    // Only extract if there's a meaningful selection (minimum 10x10 pixels)
+    if (width > 10 && height > 10) {
+      extractSelectedArea(actualStartX, actualStartY, width, height);
+    }
+    
+    // Clear the selection rectangle
+    redrawCanvas(false);
+    
+    try {
+      const canvas = canvasRef.current;
+      enlargedImage.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg')})`;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
+  // Restore zoom focus display if enabled
+  if (zoomFocus) {
     enlargedImage.style.display = 'block';
-  }
-
-  setIsDragging(false);
-  redrawCanvas()
-  const width = Math.abs(endX - startX);
-  const height = Math.abs(endY - startY);
-  
-  if (width > 10 && height > 10) {
-    extractSelectedArea();
-  }
-  
-  try {
-    const canvas = canvasRef.current;
-    enlargedImage.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg')})`;
-  } catch (error) {
-    console.log(error);
+  } else {
+    enlargedImage.style.display = 'none';
   }
 };
 
-
-  const redrawCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const img = new Image();
-    img.onload = function() {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const width = endX - startX;
-      const height = endY - startY;
+const redrawCanvas = (showSelection = true) => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  const img = new Image();
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    // Draw selection rectangle if dragging
+    if (showSelection && isDragging) {
+      const rect = canvas.getBoundingClientRect();
+      
+      // Convert element coordinates to canvas coordinates
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      const actualStartX = Math.min(startX, endX) * scaleX;
+      const actualStartY = Math.min(startY, endY) * scaleY;
+      const width = Math.abs(endX - startX) * scaleX;
+      const height = Math.abs(endY - startY) * scaleY;
+      
       ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
       ctx.lineWidth = 2;
-      ctx.strokeRect(startX, startY, width, height);
-    };
-    img.src = photo_img_url;
+      ctx.strokeRect(actualStartX, actualStartY, width, height);
+    }
   };
-const extractSelectedArea = () => {
-  try {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const tempFullCanvas = document.createElement('canvas');
-    const tempFullCtx = tempFullCanvas.getContext('2d');
-    tempFullCanvas.width = canvas.width;
-    tempFullCanvas.height = canvas.height;
-    
-    const img = new Image();
-    img.onload = function() {
-      tempFullCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-      const width = Math.abs(endX - startX);
-      const height = Math.abs(endY - startY);
-      if (width <= 0 || height <= 0) {
-        return;
-      }
-      const startXPos = Math.min(startX, endX);
-      const startYPos = Math.min(startY, endY);
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCanvas.width = width;
-      tempCanvas.height = height;
-      
-      tempCtx.drawImage(tempFullCanvas, startXPos, startYPos, width, height, 0, 0, width, height);
-      
-      const dataURL = tempCanvas.toDataURL('image/png');
-      const blob = dataURLtoBlob(dataURL);
-      const file = new File([blob], 'selected_area.png', { type: 'image/png' });
-
-      const new_id = selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1;
-
-      setSelectedImageURL(prevImages => [
-        ...prevImages,
-        {
-          id: new_id,
-          image: dataURL,
-          file: file,
-          source: undefined,
-          solution: undefined,
-        },
-      ]);
-      setGotoDetail(false);
-    };
-    
-    img.src = photo_img_url;
-  } catch (error) {
-    console.log(error);
-  }
+  img.src = photo_img_url;
 };
 
+const extractSelectedArea = (startXPos, startYPos, width, height) => {
+  try {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    // Convert element coordinates to canvas coordinates
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const canvasStartX = startXPos * scaleX;
+    const canvasStartY = startYPos * scaleY;
+    const canvasWidth = width * scaleX;
+    const canvasHeight = height * scaleY;
+    
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+ 
+    tempCanvas.width = canvasWidth;
+    tempCanvas.height = canvasHeight;
+    
+    // Extract the selected area from the main canvas using canvas coordinates
+    tempCtx.drawImage(canvas, canvasStartX, canvasStartY, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
+    
+    const blob = dataURLtoBlob(tempCanvas.toDataURL('image/png'));
+    const file = new File([blob], 'image.png', { type: 'image/png' });
+
+    const new_id = selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1;
+
+    setSelectedImageURL(prevImages => [
+      ...prevImages,
+      {
+        id: new_id,
+        image: tempCanvas.toDataURL('image/png'),
+        file: file,
+        source: undefined,
+        solution: undefined,
+      },
+    ]);
+    setGotoDetail(false);
+  } catch (error) {
+    console.log('Error extracting selected area:', error);
+  }
+};
   const dataURLtoBlob = dataURL => {
     const parts = dataURL.split(';base64,');
     const contentType = parts[0].split(':')[1];
@@ -488,7 +508,6 @@ const extractSelectedArea = () => {
       return null;
     }
   };
-
   const handleDeleteImage = id => {
     const new_img_arr = [...selectedImageURL];
     const indexToDelete = new_img_arr.findIndex(item => item.id == id);
@@ -537,6 +556,7 @@ const extractSelectedArea = () => {
           console.log(error);
         }
       };
+
       if (!isImageLoading) {
         isImageLoading = true;
 
