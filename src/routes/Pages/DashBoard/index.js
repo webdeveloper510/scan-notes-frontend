@@ -382,9 +382,7 @@ const handleMouseUp = () => {
   }
 
   setIsDragging(false);
-  redrawCanvas();
-  
-  // Only extract if there's a meaningful selection (minimum 10x10 pixels)
+  redrawCanvas()
   const width = Math.abs(endX - startX);
   const height = Math.abs(endY - startY);
   
@@ -416,7 +414,6 @@ const handleMouseUp = () => {
     };
     img.src = photo_img_url;
   };
-
 const extractSelectedArea = () => {
   try {
     const canvas = canvasRef.current;
@@ -438,7 +435,6 @@ const extractSelectedArea = () => {
       }
       const startXPos = Math.min(startX, endX);
       const startYPos = Math.min(startY, endY);
-      
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
       tempCanvas.width = width;
