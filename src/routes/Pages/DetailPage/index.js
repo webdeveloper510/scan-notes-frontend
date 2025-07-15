@@ -322,7 +322,10 @@ const DetailPage = props => {
                             <CmtImage
                               id={`second_image${result.id}`}
                               src={result.image}
-                              style={{ width: '200px', height: '150px', objectFit: 'cover' }}
+                              style={{ 
+                                // width: '200px',
+                                //  height: '150px',
+                                  objectFit: 'cover' }}
                             />
                             {currentMidi && currentMidi === result.id ? (
                               <audio
