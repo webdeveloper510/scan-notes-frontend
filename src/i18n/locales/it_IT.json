@@ -653,6 +653,7 @@
   "pages.samplePage.description": "Inizia a costruire la tua app. Felice codifica!",
   "mailNotification.title": "messaggi",
   "appNotification.title": "notifiche",
+  "pages.detailPage": "Pagina dei dettagli",
   "mailNotification.message": "Nessun nuovo messaggio al momento!",
   "appNotification.message": "Nessuna notifica al momento!",
   "popup.profile": "Profilo",
@@ -702,6 +703,13 @@
   "dashboard.scan": "Scansiona",
   "dashboard.sheet": "Spartito musicale",
   "dashboard.submit": "Invia",
-"dashboard.goto": "Vai ai dettagli"
+  "dashboard.goto": "Vai ai dettagli",
+  "detailPage.title": "Risultati",
+  "detailPage.worksheet": "Foglio di lavoro",
+  "detailpage.Title": "Titolo",
+  "detailPage.composer": "Compositore",
+  "detailPage.date": "Data di creazione",
+"detailPage.image": "Immagine",
+"detailPage.solution": "Soluzione"
 
 }

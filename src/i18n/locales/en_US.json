@@ -706,9 +706,16 @@
   "contact.reason.billing": "Billing / Subscription",
   "contact.reason.suggestion": "Suggestion / Idea",
   "contact.reason.other": "Other",
-  "dashboard.upload":"Upload Image/PDF",
-  "dashboard.scan":"Scan",
-  "dashboard.sheet":"Sheet Music",
-  "dashboard.submit":"Submit",
-  "dashboard.goto":"Go to Detail"
+  "dashboard.upload": "Upload Image/PDF",
+  "dashboard.scan": "Scan",
+  "dashboard.sheet": "Sheet Music",
+  "dashboard.submit": "Submit",
+  "dashboard.goto": "Go to Detail",
+  "detailPage.title": "Results",
+  "detailPage.worksheet": "Worksheet",
+  "detailpage.Title": "Title",
+  "detailPage.composer": "Composer",
+  "detailPage.date": "Creation Date",
+  "detailPage.image": "Image",
+  "detailPage.solution": "Solution"
 }

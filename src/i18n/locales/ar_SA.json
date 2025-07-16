@@ -1,5 +1,5 @@
 {
- "sidebar.main": "الرئيسية",
+  "sidebar.main": "الرئيسية",
   "sidebar.dashboards": "لوحة القيادة",
   "sidebar.dashboard": "لوحة القيادة",
   "sidebar.dashboard.misc": "افتراضي",
@@ -651,6 +651,7 @@
   "appModule.signin": "تسجيل الدخول",
   "appModule.signup": "سجل",
   "pages.samplePage": "نموذج الصفحة",
+  "pages.detailPage": "صفحة التفاصيل",
   "pages.samplePage.description": "ابدأ في إنشاء تطبيقك. سعيد الترميز!",
   "mailNotification.title": "رسائل",
   "appNotification.title": "إخطارات",
@@ -703,6 +704,13 @@
   "dashboard.scan": "مسح",
   "dashboard.sheet": "النوتة الموسيقية",
   "dashboard.submit": "إرسال",
-"dashboard.goto": "اذهب إلى التفاصيل"
+  "dashboard.goto": "اذهب إلى التفاصيل",
+  "detailPage.title": "النتائج",
+  "detailPage.worksheet": "ورقة العمل",
+  "detailpage.Title": "العنوان",
+"detailPage.composer": "الملحن",
+"detailPage.date": "تاريخ الإنشاء",
+"detailPage.image": "صورة",
+"detailPage.solution": "الحل"
 
 }

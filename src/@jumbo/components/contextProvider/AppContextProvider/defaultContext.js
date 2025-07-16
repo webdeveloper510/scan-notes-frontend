@@ -12,10 +12,10 @@ import {
 export default {
   theme: defaultTheme,
   defaultLng: {
-    languageId: 'english',
-    locale: 'en',
-    name: 'English',
-    icon: 'us',
+    languageId: 'french',
+    locale: 'fr',
+    name: 'French',
+    icon: 'fr',
   },
   layout: LAYOUT_TYPES.VERTICAL_DEFAULT,
   layoutType: LAYOUT_STYLES.FULL_WIDTH,

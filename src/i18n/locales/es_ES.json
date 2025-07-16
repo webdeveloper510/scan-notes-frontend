@@ -650,6 +650,7 @@
   "appModule.signin": "Registrarse",
   "appModule.signup": "Regístrate",
   "pages.samplePage": "Página de Ejemplo",
+  "pages.detailPage": "Página de detalles",
   "pages.samplePage.description": "Comience a construir su aplicación. Feliz Codificación!",
   "mailNotification.title": "Mensajes",
   "appNotification.title": "Notificaciones",
@@ -702,6 +703,13 @@
   "dashboard.scan": "Escanear",
   "dashboard.sheet": "Partitura",
   "dashboard.submit": "Enviar",
-"dashboard.goto": "Ir al detalle"
+  "dashboard.goto": "Ir al detalle",
+  "detailPage.title": "Resultados",
+  "detailPage.worksheet": "Hoja de trabajo",
+  "detailpage.Title": "Título",
+"detailPage.composer": "Compositor",
+"detailPage.date": "Fecha de creación",
+"detailPage.image": "Imagen",
+"detailPage.solution": "Solución"
 
 }

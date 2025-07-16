@@ -650,6 +650,7 @@
   "appModule.signin": "Se connecter",
   "appModule.signup": "S'inscrire",
   "pages.samplePage": "Page d'exemple",
+  "pages.detailPage": "Page de détails",
   "pages.samplePage.description": "Commencez à construire votre application. Codage heureux!",
   "mailNotification.title": "Messages",
   "appNotification.title": "Notifications",
@@ -699,9 +700,16 @@
   "contact.reason.suggestion": "Suggestion / Idée",
   "contact.reason.other": "Autre",
   "dashboard.upload": "Télécharger une image/PDF",
-"dashboard.scan": "Scanner",
-"dashboard.sheet": "Partition musicale",
-"dashboard.submit": "Soumettre",
-"dashboard.goto": "Aller aux détails"
+  "dashboard.scan": "Scanner",
+  "dashboard.sheet": "Partition musicale",
+  "dashboard.submit": "Soumettre",
+  "dashboard.goto": "Aller aux détails",
+  "detailPage.title": "Résultats",
+  "detailPage.worksheet": "Feuille de travail",
+  "detailpage.Title": "Titre",
+"detailPage.composer": "Compositeur",
+"detailPage.date": "Date de création",
+"detailPage.image": "Image",
+"detailPage.solution": "Solution"
 
 }

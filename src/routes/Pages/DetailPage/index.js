@@ -19,6 +19,8 @@ import {
   Radio,
   FormControlLabel,
   RadioGroup,
+  Typography,
+  Grid,
 } from '@material-ui/core';
 import { PlayArrow, Stop, Undo, Print, CloudDownload, Edit } from '@material-ui/icons';
 
@@ -26,7 +28,6 @@ import GridContainer from '../../../@jumbo/components/GridContainer';
 import PageContainer from '../../../@jumbo/components/PageComponents/layouts/PageContainer';
 import IntlMessages from '../../../@jumbo/utils/IntlMessages';
 import { fetchError, fetchStart, fetchSuccess } from '../../../redux/actions';
-import Grid from '@material-ui/core/Grid';
 import { $http, baseURL, mediaURL } from 'config';
 import ToastMessage from '../../Components/ToastMessage';
 import { useDispatch } from 'react-redux';
@@ -68,11 +69,24 @@ const useStyles = makeStyles(theme => ({
   imageContainer: {
     position: 'relative',
   },
+
   editImage: {
     position: 'absolute',
     bottom: -5,
     right: -5,
     zIndex: 2,
+  },
+  headerFields: {
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(2),
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.spacing(1),
+  },
+  headerInfo: {
+    padding: theme.spacing(2),
+    backgroundColor: theme.palette.grey[50],
+    borderRadius: theme.spacing(1),
+    marginBottom: theme.spacing(2),
   },
 }));
 
@@ -85,6 +99,11 @@ const DetailPage = props => {
   const [currentMidi, setCurrentMidi] = useState(0);
   const [showImage, setShowImage] = useState(-1);
   const [selectedColor, setSelectedColor] = useState('red');
+
+  // New state for title, composer, and creation date
+  const [title, setTitle] = useState('');
+  const [composer, setComposer] = useState('');
+  const [creationDate] = useState(new Date().toLocaleDateString());
 
   const theme = useTheme();
   const canvasRef = useRef(null);
@@ -144,6 +163,7 @@ const DetailPage = props => {
 
   const handleDownloadClick = () => {
     const table = document.getElementById('scan-table');
+    const headerInfo = document.getElementById('header-info');
 
     // Set the style of the second column (index 1) to hide it in the PDF
     const rows = table.getElementsByTagName('tr');
@@ -166,23 +186,85 @@ const DetailPage = props => {
       }
     }
 
-    html2canvas(table).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const img = new Image();
-      img.src = imgData;
+    // Create a temporary container for PDF generation
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.style.width = '800px';
+    container.style.backgroundColor = 'white';
+    container.style.padding = '20px';
 
-      img.addEventListener('load', function() {
-        const imageHeight = img.naturalHeight;
-        const imageWidth = img.naturalWidth;
-        const titleHeight = 30;
+    // Add header info HTML
+    const headerClone = headerInfo.cloneNode(true);
+    headerClone.style.marginBottom = '20px';
+    container.appendChild(headerClone);
 
-        const pdf = new jsPDF();
-        const width = pdf.internal.pageSize.getWidth() * 0.9;
+    // Add table HTML
+    const tableClone = table.cloneNode(true);
+    container.appendChild(tableClone);
 
-        const height = (width * imageHeight) / imageWidth; //pdf.internal.pageSize.getHeight();
-        pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
+    // Append to body temporarily
+    document.body.appendChild(container);
 
-        // Restore the style of the second column to display it back in the web page
+    html2canvas(container, {
+      backgroundColor: 'white',
+      scale: 1,
+      logging: false,
+      useCORS: true,
+    })
+      .then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const img = new Image();
+        img.src = imgData;
+
+        img.addEventListener('load', function() {
+          const imageHeight = img.naturalHeight;
+          const imageWidth = img.naturalWidth;
+          const titleHeight = 10;
+
+          const pdf = new jsPDF();
+          const width = pdf.internal.pageSize.getWidth() * 0.9;
+          const height = (width * imageHeight) / imageWidth;
+
+          pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
+
+          // Remove temporary container
+          document.body.removeChild(container);
+
+          // Restore the style of the second column to display it back in the web page
+          for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            if (cells.length > 1) {
+              cells[1].style.display = '';
+            }
+            const h_cells = rows[i].getElementsByTagName('th');
+            if (h_cells.length > 1) {
+              h_cells[1].style.display = '';
+            }
+          }
+
+          for (let i = 0; i < results.length; i++) {
+            const pencil = document.getElementById(`pencil-${i}`);
+            if (pencil) {
+              pencil.style.display = '';
+            }
+          }
+
+          // Create filename using title and composer
+          const filename = `${title || 'Untitled'}_${composer || 'Unknown'}_${creationDate.replace(/\//g, '-')}.pdf`;
+          pdf.save(filename);
+        });
+      })
+      .catch(error => {
+        console.error('Error generating PDF:', error);
+
+        // Remove temporary container on error
+        if (document.body.contains(container)) {
+          document.body.removeChild(container);
+        }
+
+        // Restore styles on error
         for (let i = 0; i < rows.length; i++) {
           const cells = rows[i].getElementsByTagName('td');
           if (cells.length > 1) {
@@ -200,10 +282,7 @@ const DetailPage = props => {
             pencil.style.display = '';
           }
         }
-
-        pdf.save('print.pdf');
       });
-    });
   };
 
   const handleEditImageClick = index => {
@@ -271,12 +350,17 @@ const DetailPage = props => {
 
   return (
     <PageContainer heading={<IntlMessages id="pages.detailPage" />} breadcrumbs={breadcrumbs}>
+      <style>{`
+      .MuiTableCell-root{
+      padding: 16px 16px 0px 16px !important
+    }
+    `}</style>
       <GridContainer>
         <Grid item xs={12}>
           <CmtCard className={classes.cardRoot}>
             <CmtCardHeader
               className="pt-4"
-              title="Results"
+              title={<IntlMessages id="detailPage.title" />}
               titleProps={{
                 variant: 'h4',
                 component: 'div',
@@ -304,35 +388,61 @@ const DetailPage = props => {
               </Box>
             </CmtCardHeader>
             <CmtCardContent className={classes.cardContentRoot}>
+              {/* Header Information Section */}
+              <div id="header-info" className={classes.headerInfo}>
+                <Typography variant="h5" gutterBottom>
+                  <IntlMessages id="detailPage.worksheet" />
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label={<IntlMessages id="detailpage.Title" />}
+                      value={title}
+                      onChange={e => setTitle(e.target.value)}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label={<IntlMessages id="detailPage.composer" />}
+                      value={composer}
+                      onChange={e => setComposer(e.target.value)}
+                      variant="outlined"
+                      margin="normal"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label={<IntlMessages id="detailPage.date" />}
+                      value={creationDate}
+                      variant="outlined"
+                      margin="normal"
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+
               <div className="Cmt-table-responsive" id="scan-table">
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Image</TableCell>
-                      <TableCell>Source</TableCell>
-                      <TableCell>Solution</TableCell>
-                      <TableCell>Comment</TableCell>
+                      <TableCell>{<IntlMessages id="detailPage.image" />}</TableCell>
+                      <TableCell>{<IntlMessages id="detailPage.solution" />}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {results.map((result, index) => (
                       <TableRow key={index}>
                         <TableCell>
-                          <div className={`jr-card-thumb image-container ${classes.imageContainer}`}>
-                            <CmtImage
-                              id={`second_image${result.id}`}
-                              src={result.image}
-                              style={{ 
-                                // width: '200px',
-                                //  height: '150px',
-                                  objectFit: 'cover' }}
-                            />
-                            {currentMidi && currentMidi === result.id ? (
-                              <audio
-                                src={`${mediaURL}${result.source}`}
-                                controls
-                                autoPlay={result.id === currentMidi}></audio>
-                            ) : null}
+                          <div className={`jr-card-thumb image-container pb-0 ${classes.imageContainer}`}>
+                            <CmtImage id={`second_image${result.id}`} src={result.image} style={{ objectFit: 'cover' }} />
                             <IconButton
                               className={classes.editImage}
                               variant="contained"
@@ -342,22 +452,6 @@ const DetailPage = props => {
                               <Edit />
                             </IconButton>
                           </div>
-                        </TableCell>
-                        <TableCell style={{ padding: '0px' }}>
-                          {result.source ? (
-                            <IconButton
-                              style={{ marginLeft: 4 }}
-                              color="secondary"
-                              onClick={() => handlePlayMidi(result.id)}>
-                              {result.id === currentMidi ? <Stop /> : <PlayArrow />}
-                            </IconButton>
-                          ) : null}
-                        </TableCell>
-                        <TableCell>
-                          <TextField multiline minRows={4} />
-                        </TableCell>
-                        <TableCell>
-                          <TextField multiline minRows={4} />
                         </TableCell>
                       </TableRow>
                     ))}

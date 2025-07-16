@@ -702,6 +702,14 @@
   "dashboard.scan": "扫描",
   "dashboard.sheet": "乐谱",
   "dashboard.submit": "提交",
-"dashboard.goto": "查看详情"
+  "dashboard.goto": "查看详情",
+  "pages.detailPage": "详情页",
+  "detailPage.title": "结果",
+  "detailPage.worksheet": "工作表",
+  "detailpage.Title": "标题",
+  "detailPage.composer": "作曲家",
+  "detailPage.date": "创建日期",
+  "detailPage.image": "图片",
+"detailPage.solution": "解决方案"
 
 }
