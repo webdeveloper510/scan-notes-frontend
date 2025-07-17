@@ -701,15 +701,18 @@
   "contact.reason.other": "Otro",
   "dashboard.upload": "Subir imagen/PDF",
   "dashboard.scan": "Escanear",
-  "dashboard.sheet": "Partitura",
-  "dashboard.submit": "Enviar",
-  "dashboard.goto": "Ir al detalle",
+ "dashboard.sheet": "Hoja",
+  "dashboard.submit": "validar las selecciones",
+ "dashboard.goto": "Generar la hoja de trabajo",
   "detailPage.title": "Resultados",
   "detailPage.worksheet": "Hoja de trabajo",
+  "detailPage.worksheett": "HOJA DE TRABAJO",
+
   "detailpage.Title": "Título",
 "detailPage.composer": "Compositor",
 "detailPage.date": "Fecha de creación",
-"detailPage.image": "Imagen",
-"detailPage.solution": "Solución"
+"detailPage.image": "selecciones de pasajes",
+"detailPage.solution": "Solución",
+"dashboard.imageTitle": "Selección de pasajes"
 
 }

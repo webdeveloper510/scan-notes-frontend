@@ -701,15 +701,17 @@
   "contact.reason.other": "Autre",
   "dashboard.upload": "Télécharger une image/PDF",
   "dashboard.scan": "Scanner",
-  "dashboard.sheet": "Partition musicale",
-  "dashboard.submit": "Soumettre",
-  "dashboard.goto": "Aller aux détails",
+  "dashboard.sheet": "Partition",
+  "dashboard.submit": "valider les sélections",
+ "dashboard.goto": "Générer la fiche de travail",
   "detailPage.title": "Résultats",
-  "detailPage.worksheet": "Feuille de travail",
+  "detailPage.worksheet": "Fiche de travail",
+   "detailPage.worksheett": "FICHE DE TRAVAIL",
   "detailpage.Title": "Titre",
 "detailPage.composer": "Compositeur",
 "detailPage.date": "Date de création",
-"detailPage.image": "Image",
-"detailPage.solution": "Solution"
+"detailPage.image": "sélections passages",
+"detailPage.solution": "Solution",
+"dashboard.imageTitle": "Sélection de passages"
 
 }

@@ -701,15 +701,17 @@
   "contact.reason.other": "Altro",
   "dashboard.upload": "Carica immagine/PDF",
   "dashboard.scan": "Scansiona",
-  "dashboard.sheet": "Spartito musicale",
-  "dashboard.submit": "Invia",
-  "dashboard.goto": "Vai ai dettagli",
+  "dashboard.sheet": "Spartito",
+  "dashboard.submit": "convalidare le selezioni",
+ "dashboard.goto": "Genera il foglio di lavoro",
   "detailPage.title": "Risultati",
   "detailPage.worksheet": "Foglio di lavoro",
+  "detailPage.worksheett": "FOGLIO DI LAVORO",
   "detailpage.Title": "Titolo",
   "detailPage.composer": "Compositore",
   "detailPage.date": "Data di creazione",
-"detailPage.image": "Immagine",
-"detailPage.solution": "Soluzione"
+"detailPage.image": "selezioni di passaggi",
+"detailPage.solution": "Soluzione",
+"dashboard.imageTitle": "Selezione dei passaggi"
 
 }

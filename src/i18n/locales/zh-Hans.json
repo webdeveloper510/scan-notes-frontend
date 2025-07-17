@@ -701,15 +701,17 @@
   "dashboard.upload": "上传图片/PDF",
   "dashboard.scan": "扫描",
   "dashboard.sheet": "乐谱",
-  "dashboard.submit": "提交",
-  "dashboard.goto": "查看详情",
+  "dashboard.submit": "验证选择",
+ "dashboard.goto": "生成工作表",
   "pages.detailPage": "详情页",
   "detailPage.title": "结果",
   "detailPage.worksheet": "工作表",
+  "detailPage.worksheett": "工作表",
   "detailpage.Title": "标题",
   "detailPage.composer": "作曲家",
   "detailPage.date": "创建日期",
-  "detailPage.image": "图片",
-"detailPage.solution": "解决方案"
+  "detailPage.image": "段落选择",
+"detailPage.solution": "解决方案",
+"dashboard.imageTitle": "段落选择"
 
 }

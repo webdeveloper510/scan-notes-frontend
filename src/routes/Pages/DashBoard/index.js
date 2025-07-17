@@ -77,16 +77,16 @@ const useStyles = makeStyles(theme => ({
   canvasSection: {
     flex: 1,
     minWidth: 0,
-    marginTop: '-20px',
-    marginLeft: theme.spacing(1),
+    marginTop: '0px',
+    // marginLeft: theme.spacing(1),
   },
   selectedImagesSection: {
+    flex: 1,
     width: '400px',
     minWidth: '400px',
     maxHeight: '800px',
     overflow: 'auto',
     order: -1,
-    marginTop: '10px',
   },
   selectedImageItem: {
     display: 'flex',
@@ -126,6 +126,9 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     marginLeft: theme.spacing(1),
     fontSize: '0.875rem',
+  },
+  sectionTitle: {
+    textAlign: 'center',
   },
   controlsSection: {
     display: 'flex',
@@ -512,28 +515,42 @@ const DashBoard = props => {
     img.src = photo_img_url;
   };
 
-  const extractSelectedArea = (startXPos, startYPos, width, height) => {
-    try {
-      const canvas = canvasRef.current;
-      const rect = canvas.getBoundingClientRect();
+const extractSelectedArea = (startXPos, startYPos, width, height) => {
+  try {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
 
-      // Convert element coordinates to canvas coordinates
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
+    // Convert element coordinates to canvas coordinates
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-      const canvasStartX = startXPos * scaleX;
-      const canvasStartY = startYPos * scaleY;
-      const canvasWidth = width * scaleX;
-      const canvasHeight = height * scaleY;
+    const canvasStartX = startXPos * scaleX;
+    const canvasStartY = startYPos * scaleY;
+    const canvasWidth = width * scaleX;
+    const canvasHeight = height * scaleY;
 
+    // Create a clean canvas with just the original image (no selection rectangle)
+    const cleanCanvas = document.createElement('canvas');
+    const cleanCtx = cleanCanvas.getContext('2d');
+    
+    cleanCanvas.width = canvas.width;
+    cleanCanvas.height = canvas.height;
+    
+    // Draw the original image without any selection rectangle
+    const img = new Image();
+    img.onload = function() {
+      cleanCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      // Now create the cropped image from the clean canvas
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
 
       tempCanvas.width = canvasWidth;
       tempCanvas.height = canvasHeight;
 
-      // Extract the selected area from the main canvas using canvas coordinates
-      tempCtx.drawImage(canvas, canvasStartX, canvasStartY, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
+      // Extract the selected area from the clean canvas
+      tempCtx.drawImage(cleanCanvas, canvasStartX, canvasStartY, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
 
       const blob = dataURLtoBlob(tempCanvas.toDataURL('image/png'));
       const file = new File([blob], 'image.png', { type: 'image/png' });
@@ -551,10 +568,13 @@ const DashBoard = props => {
         },
       ]);
       setGotoDetail(false);
-    } catch (error) {
-      console.log('Error extracting selected area:', error);
-    }
-  };
+    };
+    
+    img.src = photo_img_url;
+  } catch (error) {
+    console.log('Error extracting selected area:', error);
+  }
+};
   const dataURLtoBlob = dataURL => {
     const parts = dataURL.split(';base64,');
     const contentType = parts[0].split(':')[1];
@@ -777,86 +797,92 @@ const DashBoard = props => {
                 {/* Selected images section - now on the left */}
                 <div className={classes.selectedImagesSection}>
                   {selectedImageURL.length > 0 && (
-                    <CmtCard>
-                      <CmtCardContent>
-                        <PerfectScrollbar>
-                          {selectedImageURL.map(img => (
-                            <div
-                              key={img.id}
-                              className={clsx(
-                                classes.selectedImageItem,
-                                dragOverItem && dragOverItem.id === img.id && classes.draggedOver,
-                                draggedItem && draggedItem.id === img.id && classes.beingDragged,
-                              )}
-                              draggable
-                              onDragStart={e => handleDragStart(e, img)}
-                              onDragOver={e => handleDragOver(e, img)}
-                              onDragEnter={handleDragEnter}
-                              onDragLeave={handleDragLeave}
-                              onDrop={e => handleDrop(e, img)}
-                              onDragEnd={handleDragEnd}>
-                              <div className={classes.selectedImageThumbnail}>
-                                <CmtImage
-                                  src={img.image}
-                                  style={{
-                                    // width: '60px',
-                                    height: '60px',
-                                    objectFit: 'cover',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                  }}
-                                />
-                              </div>
-                              <div className={classes.selectedImageSolution}>
-                                {img.solution ? (
-                                  <Typography variant="body2">{img.solution}</Typography>
-                                ) : (
-                                  <Typography variant="body2" color="textSecondary"></Typography>
+                    <>
+                      <Box className={classes.sectionTitle} style={{ marginBottom: '8px' }}>
+                        <Typography variant="h6">
+                          <IntlMessages id="dashboard.imageTitle" />
+                        </Typography>
+                      </Box>
+                      <CmtCard>
+                        <CmtCardContent>
+                          <PerfectScrollbar>
+                            {selectedImageURL.map(img => (
+                              <div
+                                key={img.id}
+                                className={clsx(
+                                  classes.selectedImageItem,
+                                  dragOverItem && dragOverItem.id === img.id && classes.draggedOver,
+                                  draggedItem && draggedItem.id === img.id && classes.beingDragged,
                                 )}
-                                {currentMidi && currentMidi === img.id && img.source && (
-                                  <audio
-                                    src={`${mediaURL}${img.source}`}
-                                    controls
-                                    autoPlay={img.id === currentMidi}
-                                    style={{ width: '100%', marginTop: '8px' }}
+                                draggable
+                                onDragStart={e => handleDragStart(e, img)}
+                                onDragOver={e => handleDragOver(e, img)}
+                                onDragEnter={handleDragEnter}
+                                onDragLeave={handleDragLeave}
+                                onDrop={e => handleDrop(e, img)}
+                                onDragEnd={handleDragEnd}>
+                                <div className={classes.selectedImageThumbnail}>
+                                  <CmtImage
+                                    src={img.image}
+                                    style={{
+                                      height: '60px',
+                                      objectFit: 'cover',
+                                      border: '1px solid #ddd',
+                                      borderRadius: '4px',
+                                    }}
                                   />
-                                )}
-                              </div>
-                              <div className={classes.selectedImageActions}>
-                                {img.source && (
-                                  <IconButton size="small" color="primary" onClick={() => handlePlayMidi(img.id)}>
-                                    {img.id === currentMidi ? <Stop /> : <PlayArrow />}
+                                </div>
+                                <div className={classes.selectedImageSolution}>
+                                  {img.solution ? (
+                                    <Typography variant="body2">{img.solution}</Typography>
+                                  ) : (
+                                    <Typography variant="body2" color="textSecondary"></Typography>
+                                  )}
+                                  {currentMidi && currentMidi === img.id && img.source && (
+                                    <audio
+                                      src={`${mediaURL}${img.source}`}
+                                      controls
+                                      autoPlay={img.id === currentMidi}
+                                      style={{ width: '100%', marginTop: '8px' }}
+                                    />
+                                  )}
+                                </div>
+                                <div className={classes.selectedImageActions}>
+                                  {img.source && (
+                                    <IconButton size="small" color="primary" onClick={() => handlePlayMidi(img.id)}>
+                                      {img.id === currentMidi ? <Stop /> : <PlayArrow />}
+                                    </IconButton>
+                                  )}
+                                  <IconButton size="small" color="secondary" onClick={() => handleDeleteImage(img.id)}>
+                                    <Delete />
                                   </IconButton>
-                                )}
-                                <IconButton size="small" color="secondary" onClick={() => handleDeleteImage(img.id)}>
-                                  <Delete />
-                                </IconButton>
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        </PerfectScrollbar>
-                        <Box mt={2}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            onClick={handleSubmitClick}
-                            disabled={loading || selectedImageURL.length === 0}
-                            startIcon={<Send />}
-                            style={{ marginBottom: '8px' }}>
-                            {<IntlMessages id="dashboard.submit" />}
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            fullWidth
-                            onClick={handleGotoDetailClick}
-                            disabled={!gotoDetail}>
-                            {<IntlMessages id="dashboard.goto" />}
-                          </Button>
-                        </Box>
-                      </CmtCardContent>
-                    </CmtCard>
+                            ))}
+                          </PerfectScrollbar>
+                          <Box mt={2}>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              fullWidth
+                              onClick={handleSubmitClick}
+                              disabled={loading || selectedImageURL.length === 0}
+                              startIcon={<Send />}
+                              style={{ marginBottom: '8px' }}>
+                              <IntlMessages id="dashboard.submit" />
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              fullWidth
+                              onClick={handleGotoDetailClick}
+                              disabled={!gotoDetail}>
+                              <IntlMessages id="dashboard.goto" />
+                            </Button>
+                          </Box>
+                        </CmtCardContent>
+                      </CmtCard>
+                    </>
                   )}
                 </div>
                 {/* Canvas section - now on the right */}

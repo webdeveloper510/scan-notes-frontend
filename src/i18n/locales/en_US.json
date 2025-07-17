@@ -708,14 +708,16 @@
   "contact.reason.other": "Other",
   "dashboard.upload": "Upload Image/PDF",
   "dashboard.scan": "Scan",
-  "dashboard.sheet": "Sheet Music",
-  "dashboard.submit": "Submit",
-  "dashboard.goto": "Go to Detail",
+  "dashboard.sheet": "Sheet",
+  "dashboard.submit": "validate the selections",
+  "dashboard.goto": "generate the worksheet",
   "detailPage.title": "Results",
   "detailPage.worksheet": "Worksheet",
+  "detailPage.worksheett": "WORKSHEET",
   "detailpage.Title": "Title",
   "detailPage.composer": "Composer",
   "detailPage.date": "Creation Date",
-  "detailPage.image": "Image",
-  "detailPage.solution": "Solution"
+  "detailPage.image": "passages selections",
+  "detailPage.solution": "Solution",
+  "dashboard.imageTitle":"Selection of passages"
 }

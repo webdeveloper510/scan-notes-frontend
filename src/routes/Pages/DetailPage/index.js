@@ -23,7 +23,7 @@ import {
   Grid,
 } from '@material-ui/core';
 import { PlayArrow, Stop, Undo, Print, CloudDownload, Edit } from '@material-ui/icons';
-
+import { useIntl } from 'react-intl';
 import GridContainer from '../../../@jumbo/components/GridContainer';
 import PageContainer from '../../../@jumbo/components/PageComponents/layouts/PageContainer';
 import IntlMessages from '../../../@jumbo/utils/IntlMessages';
@@ -34,18 +34,18 @@ import { useDispatch } from 'react-redux';
 import CmtCard from '../../../@coremat/CmtCard';
 import CmtImage from '../../../@coremat/CmtImage';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
 import CmtCardContent from '../../../@coremat/CmtCard/CmtCardContent';
 import CmtCardHeader from '../../../@coremat/CmtCard/CmtCardHeader';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { useTheme } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const breadcrumbs = [
   { label: <IntlMessages id={'sidebar.main'} />, link: '/' },
-  { label: <IntlMessages id={'pages.detailPage'} />, isActive: true },
+  { label: <IntlMessages id={'detailPage.worksheet'} />, isActive: true },
 ];
 
 const useStyles = makeStyles(theme => ({
@@ -69,7 +69,6 @@ const useStyles = makeStyles(theme => ({
   imageContainer: {
     position: 'relative',
   },
-
   editImage: {
     position: 'absolute',
     bottom: -5,
@@ -88,6 +87,35 @@ const useStyles = makeStyles(theme => ({
     borderRadius: theme.spacing(1),
     marginBottom: theme.spacing(2),
   },
+  drawingCanvas: {
+    border: '1px solid #ccc',
+    cursor: 'crosshair',
+    display: 'block',
+    margin: '10px auto',
+  },
+  // Drag and drop styles
+  draggableRow: {
+    cursor: 'move',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#f5f5f5',
+    },
+  },
+  draggedOver: {
+    backgroundColor: '#e3f2fd',
+    borderLeft: '4px solid #2196f3',
+    transform: 'scale(1.01)',
+  },
+  beingDragged: {
+    opacity: 0.5,
+    transform: 'rotate(1deg)',
+  },
+
+  tableRowDraggable: {
+    '&:hover': {
+      backgroundColor: '#f9f9f9',
+    },
+  },
 }));
 
 const DetailPage = props => {
@@ -99,12 +127,13 @@ const DetailPage = props => {
   const [currentMidi, setCurrentMidi] = useState(0);
   const [showImage, setShowImage] = useState(-1);
   const [selectedColor, setSelectedColor] = useState('red');
-
-  // New state for title, composer, and creation date
   const [title, setTitle] = useState('');
   const [composer, setComposer] = useState('');
   const [creationDate] = useState(new Date().toLocaleDateString());
-
+  const [solutions, setSolutions] = useState({});
+  const intl = useIntl();
+  const worksheetLabel = intl.formatMessage({ id: 'detailPage.worksheet' });
+  const solutionLabel = intl.formatMessage({ id: 'detailPage.solution' });
   const theme = useTheme();
   const canvasRef = useRef(null);
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -112,6 +141,10 @@ const DetailPage = props => {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [zoomRate, setZoomRate] = useState(2);
+
+  // Drag and drop state
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [dragOverItem, setDragOverItem] = useState(null);
 
   useEffect(() => {
     if (showImage >= 0) {
@@ -123,12 +156,8 @@ const DetailPage = props => {
           img.onload = function() {
             let width = img.width * zoomRate;
             let height = img.height * zoomRate;
-
-            // set the canvas dimensions to match the scaled image size
             canvas.width = width;
             canvas.height = height;
-
-            // draw the image onto the canvas at the correct size
             ctx.drawImage(img, 0, 0, width, height);
           };
           img.src = results.find(item => item.id == showImage).image;
@@ -136,7 +165,60 @@ const DetailPage = props => {
       };
       setTimeout(handleImageLoad, 0);
     }
-  }, [showImage]);
+  }, [showImage, zoomRate]);
+
+  // Drag and drop handlers
+  const handleDragStart = (e, item) => {
+    setDraggedItem(item);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+  };
+
+  const handleDragOver = (e, item) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverItem(item);
+  };
+
+  const handleDragEnter = e => {
+    e.preventDefault();
+  };
+
+  const handleDragLeave = e => {
+    // Only clear dragOverItem if we're actually leaving the item
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverItem(null);
+    }
+  };
+
+  const handleDrop = (e, targetItem) => {
+    e.preventDefault();
+
+    if (!draggedItem || draggedItem.id === targetItem.id) {
+      setDraggedItem(null);
+      setDragOverItem(null);
+      return;
+    }
+
+    const newResultsArray = [...results];
+    const draggedIndex = newResultsArray.findIndex(item => item.id === draggedItem.id);
+    const targetIndex = newResultsArray.findIndex(item => item.id === targetItem.id);
+
+    // Remove the dragged item
+    const [draggedItemData] = newResultsArray.splice(draggedIndex, 1);
+
+    // Insert it at the target position
+    newResultsArray.splice(targetIndex, 0, draggedItemData);
+
+    setResults(newResultsArray);
+    setDraggedItem(null);
+    setDragOverItem(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDragOverItem(null);
+  };
 
   const handleMessageClose = () => () => {
     setShowMessage(false);
@@ -161,24 +243,19 @@ const DetailPage = props => {
     window.print();
   };
 
+  const handleSolutionChange = (resultId, value) => {
+    setSolutions(prev => ({
+      ...prev,
+      [resultId]: value
+    }));
+  };
+
   const handleDownloadClick = () => {
     const table = document.getElementById('scan-table');
     const headerInfo = document.getElementById('header-info');
-
-    // Set the style of the second column (index 1) to hide it in the PDF
     const rows = table.getElementsByTagName('tr');
-    for (let i = 0; i < rows.length; i++) {
-      const cells = rows[i].getElementsByTagName('td');
-      if (cells.length > 1) {
-        cells[1].style.display = 'none';
-      }
-      const h_cells = rows[i].getElementsByTagName('th');
-
-      if (h_cells.length > 1) {
-        h_cells[1].style.display = 'none';
-      }
-    }
-
+    
+    // Hide solution column buttons for PDF
     for (let i = 0; i < results.length; i++) {
       const pencil = document.getElementById(`pencil-${i}`);
       if (pencil) {
@@ -186,7 +263,6 @@ const DetailPage = props => {
       }
     }
 
-    // Create a temporary container for PDF generation
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.left = '-9999px';
@@ -194,22 +270,87 @@ const DetailPage = props => {
     container.style.width = '800px';
     container.style.backgroundColor = 'white';
     container.style.padding = '20px';
+    
+    const cleanHeader = document.createElement('div');
+    cleanHeader.innerHTML = `
+      <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 10px;">
+        ${worksheetLabel}
+      </div>
+      <div style="margin-bottom: 10px;"><strong>Creation Date:</strong> ${creationDate}</div>
+      <div style="margin-bottom: 10px;"><strong>Title:</strong> ${title || 'Untitled'}</div>
+      <div style="margin-bottom: 10px;"><strong>Composer:</strong> ${composer || 'Unknown'}</div>
+    `;
+    container.appendChild(cleanHeader);
 
-    // Add header info HTML
-    const headerClone = headerInfo.cloneNode(true);
-    headerClone.style.marginBottom = '20px';
-    container.appendChild(headerClone);
-
-    // Add table HTML
-    const tableClone = table.cloneNode(true);
+    // Create table with proper headers for PDF
+    const tableClone = document.createElement('table');
+    tableClone.style.width = '100%';
+    tableClone.style.borderCollapse = 'collapse';
+    tableClone.style.marginTop = '20px';
+    
+    // Add table headers
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const imageHeader = document.createElement('th');
+    imageHeader.style.border = '1px solid #ddd';
+    imageHeader.style.padding = '8px';
+    imageHeader.style.textAlign = 'left';
+    imageHeader.style.backgroundColor = '#f5f5f5';
+    imageHeader.style.width = '50%';
+    imageHeader.textContent = intl.formatMessage({ id: 'detailPage.image' });
+    
+    const solutionHeader = document.createElement('th');
+    solutionHeader.style.border = '1px solid #ddd';
+    solutionHeader.style.padding = '8px';
+    solutionHeader.style.textAlign = 'left';
+    solutionHeader.style.backgroundColor = '#f5f5f5';
+    solutionHeader.style.width = '50%';
+    solutionHeader.textContent = solutionLabel;
+    
+    headerRow.appendChild(imageHeader);
+    headerRow.appendChild(solutionHeader);
+    thead.appendChild(headerRow);
+    tableClone.appendChild(thead);
+    
+    // Add table body
+    const tbody = document.createElement('tbody');
+    
+    results.forEach((result, index) => {
+      const row = document.createElement('tr');
+      
+      const imageCell = document.createElement('td');
+      imageCell.style.border = '1px solid #ddd';
+      imageCell.style.padding = '8px';
+      imageCell.style.verticalAlign = 'top';
+      
+      const img = document.createElement('img');
+      img.src = result.image;
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      imageCell.appendChild(img);
+      
+      const solutionCell = document.createElement('td');
+      solutionCell.style.border = '1px solid #ddd';
+      solutionCell.style.padding = '8px';
+      solutionCell.style.verticalAlign = 'top';
+      solutionCell.style.minHeight = '100px';
+      solutionCell.style.whiteSpace = 'pre-wrap';
+      solutionCell.style.wordBreak = 'break-word';
+      solutionCell.textContent = solutions[result.id] || '';
+      
+      row.appendChild(imageCell);
+      row.appendChild(solutionCell);
+      tbody.appendChild(row);
+    });
+    
+    tableClone.appendChild(tbody);
     container.appendChild(tableClone);
-
-    // Append to body temporarily
     document.body.appendChild(container);
 
     html2canvas(container, {
       backgroundColor: 'white',
-      scale: 1,
+      scale: 2,
       logging: false,
       useCORS: true,
     })
@@ -228,54 +369,27 @@ const DetailPage = props => {
           const height = (width * imageHeight) / imageWidth;
 
           pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
-
-          // Remove temporary container
           document.body.removeChild(container);
-
-          // Restore the style of the second column to display it back in the web page
-          for (let i = 0; i < rows.length; i++) {
-            const cells = rows[i].getElementsByTagName('td');
-            if (cells.length > 1) {
-              cells[1].style.display = '';
-            }
-            const h_cells = rows[i].getElementsByTagName('th');
-            if (h_cells.length > 1) {
-              h_cells[1].style.display = '';
-            }
-          }
-
+          
+          // Restore hidden elements
           for (let i = 0; i < results.length; i++) {
             const pencil = document.getElementById(`pencil-${i}`);
             if (pencil) {
               pencil.style.display = '';
             }
           }
-
-          // Create filename using title and composer
-          const filename = `${title || 'Untitled'}_${composer || 'Unknown'}_${creationDate.replace(/\//g, '-')}.pdf`;
+          
+          const filename = `${composer || 'Unknown'} ${title || 'Untitled'} ${creationDate.replace(/\//g, '-')}.pdf`;
           pdf.save(filename);
         });
       })
       .catch(error => {
         console.error('Error generating PDF:', error);
-
-        // Remove temporary container on error
         if (document.body.contains(container)) {
           document.body.removeChild(container);
         }
-
-        // Restore styles on error
-        for (let i = 0; i < rows.length; i++) {
-          const cells = rows[i].getElementsByTagName('td');
-          if (cells.length > 1) {
-            cells[1].style.display = '';
-          }
-          const h_cells = rows[i].getElementsByTagName('th');
-          if (h_cells.length > 1) {
-            h_cells[1].style.display = '';
-          }
-        }
-
+        
+        // Restore hidden elements
         for (let i = 0; i < results.length; i++) {
           const pencil = document.getElementById(`pencil-${i}`);
           if (pencil) {
@@ -317,9 +431,14 @@ const DetailPage = props => {
   };
 
   const handleImageMouseDown = event => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
     setIsDrawing(true);
-    setStartX(event.nativeEvent.offsetX);
-    setStartY(event.nativeEvent.offsetY);
+    setStartX((event.clientX - rect.left) * scaleX);
+    setStartY((event.clientY - rect.top) * scaleY);
   };
 
   const handleImageMouseMove = event => {
@@ -329,15 +448,20 @@ const DetailPage = props => {
 
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-    const currentX = event.nativeEvent.offsetX;
-    const currentY = event.nativeEvent.offsetY;
+    const currentX = (event.clientX - rect.left) * scaleX;
+    const currentY = (event.clientY - rect.top) * scaleY;
 
     context.beginPath();
     context.moveTo(startX, startY);
     context.lineTo(currentX, currentY);
     context.strokeStyle = selectedColor;
-    context.lineWidth = 2;
+    context.lineWidth = 3;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
     context.stroke();
 
     setStartX(currentX);
@@ -349,49 +473,43 @@ const DetailPage = props => {
   };
 
   return (
-    <PageContainer heading={<IntlMessages id="pages.detailPage" />} breadcrumbs={breadcrumbs}>
+    <PageContainer heading={<IntlMessages id="detailPage.worksheet" />} breadcrumbs={breadcrumbs}>
       <style>{`
       .MuiTableCell-root{
-      padding: 16px 16px 0px 16px !important
+      padding: 1px 16px 0px 16px !important
     }
     `}</style>
       <GridContainer>
         <Grid item xs={12}>
           <CmtCard className={classes.cardRoot}>
-            <CmtCardHeader
-              className="pt-4"
-              title={<IntlMessages id="detailPage.title" />}
-              titleProps={{
-                variant: 'h4',
-                component: 'div',
-              }}>
-              <Box clone mx={4}>
+            <Box display="flex" justifyContent="flex-end" p={2} pt={4}>
+              <Box mx={1}>
                 <Tooltip title="Print" aria-label="Print">
                   <Button color="primary" variant="contained" onClick={handlePrintClick}>
                     <Print />
                   </Button>
                 </Tooltip>
               </Box>
-              <Box clone mx={4}>
+              <Box mx={1}>
                 <Tooltip title="Download" aria-label="Download">
                   <Button color="primary" variant="contained" onClick={handleDownloadClick}>
                     <CloudDownload />
                   </Button>
                 </Tooltip>
               </Box>
-              <Box clone mx={4}>
+              <Box mx={1}>
                 <Tooltip title="Go Back" aria-label="Go Back">
                   <Button color="primary" onClick={handleGoBackClick}>
                     <Undo />
                   </Button>
                 </Tooltip>
               </Box>
-            </CmtCardHeader>
+            </Box>
             <CmtCardContent className={classes.cardContentRoot}>
               {/* Header Information Section */}
               <div id="header-info" className={classes.headerInfo}>
-                <Typography variant="h5" gutterBottom>
-                  <IntlMessages id="detailPage.worksheet" />
+                <Typography variant="h5" gutterBottom align='center'>
+                  <IntlMessages id="detailPage.worksheett" />
                 </Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={4}>
@@ -433,13 +551,31 @@ const DetailPage = props => {
                 <Table>
                   <TableHead>
                     <TableRow>
+                      <TableCell width="20">#</TableCell>
                       <TableCell>{<IntlMessages id="detailPage.image" />}</TableCell>
                       <TableCell>{<IntlMessages id="detailPage.solution" />}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {results.map((result, index) => (
-                      <TableRow key={index}>
+                      <TableRow 
+                        key={result.id}
+                        className={clsx(
+                          classes.draggableRow,
+                          classes.tableRowDraggable,
+                          dragOverItem && dragOverItem.id === result.id && classes.draggedOver,
+                          draggedItem && draggedItem.id === result.id && classes.beingDragged,
+                        )}
+                        draggable
+                        onDragStart={e => handleDragStart(e, result)}
+                        onDragOver={e => handleDragOver(e, result)}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
+                        onDrop={e => handleDrop(e, result)}
+                        onDragEnd={handleDragEnd}
+                      >
+                        <TableCell>
+                        </TableCell>
                         <TableCell>
                           <div className={`jr-card-thumb image-container pb-0 ${classes.imageContainer}`}>
                             <CmtImage id={`second_image${result.id}`} src={result.image} style={{ objectFit: 'cover' }} />
@@ -452,6 +588,15 @@ const DetailPage = props => {
                               <Edit />
                             </IconButton>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            multiline
+                            variant="outlined"
+                            placeholder="Write your solution here..."
+                            value={solutions[result.id] || ''}
+                            onChange={(e) => handleSolutionChange(result.id, e.target.value)}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -466,13 +611,19 @@ const DetailPage = props => {
         fullScreen={fullScreen}
         open={showImage >= 0}
         onClose={handleImageClose}
-        aria-labelledby="responsive-dialog-title">
+        aria-labelledby="responsive-dialog-title"
+        maxWidth="md">
         <DialogTitle id="responsive-dialog-title">
-          {'Choisissez une tonalité de couleur et modifiez votre image.'}
+          {'Choose a color and edit your image'}
         </DialogTitle>
         <DialogContent>
-          <Box>
-            <RadioGroup aria-label="Color" name="color" value={selectedColor} onChange={handleColorChange}>
+          <Box mb={2}>
+            <RadioGroup 
+              aria-label="Color" 
+              name="color" 
+              value={selectedColor} 
+              onChange={handleColorChange}
+              row>
               <FormControlLabel
                 value={'red'}
                 control={<Radio style={{ color: 'red' }} />}
@@ -501,10 +652,17 @@ const DetailPage = props => {
           </Box>
           <canvas
             ref={canvasRef}
-            style={{ height: '500', width: '500', left: 0, top: 0 }}
+            className={classes.drawingCanvas}
+            style={{ 
+              maxWidth: '100%', 
+              maxHeight: '500px',
+              display: 'block',
+              margin: '0 auto'
+            }}
             onMouseDown={handleImageMouseDown}
             onMouseMove={handleImageMouseMove}
             onMouseUp={handleImageMouseUp}
+            onMouseLeave={handleImageMouseUp}
           />
         </DialogContent>
         <DialogActions>
