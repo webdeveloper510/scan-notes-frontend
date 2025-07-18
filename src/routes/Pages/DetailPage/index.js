@@ -110,11 +110,19 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.5,
     transform: 'rotate(1deg)',
   },
-
   tableRowDraggable: {
     '&:hover': {
       backgroundColor: '#f9f9f9',
     },
+  },
+  // New styles for column widths
+  imageColumn: {
+    width: '66.66%', // 2/3 of the available width
+    minWidth: '400px', // Minimum width to ensure images are visible
+  },
+  solutionColumn: {
+    width: '33.33%', // 1/3 of the available width
+    minWidth: '200px', // Minimum width for solution text
   },
 }));
 
@@ -134,6 +142,12 @@ const DetailPage = props => {
   const intl = useIntl();
   const worksheetLabel = intl.formatMessage({ id: 'detailPage.worksheet' });
   const solutionLabel = intl.formatMessage({ id: 'detailPage.solution' });
+  
+  // Add translated labels for PDF
+  const creationDateLabel = intl.formatMessage({ id: 'detailPage.creationDate' });
+  const titleLabel = intl.formatMessage({ id: 'detailPage.title' });
+  const composerLabel = intl.formatMessage({ id: 'detailPage.composer' });
+  
   const theme = useTheme();
   const canvasRef = useRef(null);
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -250,144 +264,132 @@ const DetailPage = props => {
     }));
   };
 
-  const handleDownloadClick = () => {
-    const table = document.getElementById('scan-table');
-    const headerInfo = document.getElementById('header-info');
-    const rows = table.getElementsByTagName('tr');
-    
-    // Hide solution column buttons for PDF
-    for (let i = 0; i < results.length; i++) {
-      const pencil = document.getElementById(`pencil-${i}`);
-      if (pencil) {
-        pencil.style.display = 'none';
-      }
+const handleDownloadClick = () => {
+  const table = document.getElementById('scan-table');
+  const headerInfo = document.getElementById('header-info');
+  const rows = table.getElementsByTagName('tr');
+  
+  // Hide solution column buttons for PDF
+  for (let i = 0; i < results.length; i++) {
+    const pencil = document.getElementById(`pencil-${i}`);
+    if (pencil) {
+      pencil.style.display = 'none';
     }
+  }
 
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '-9999px';
-    container.style.width = '800px';
-    container.style.backgroundColor = 'white';
-    container.style.padding = '20px';
-    
-    const cleanHeader = document.createElement('div');
-    cleanHeader.innerHTML = `
-      <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 10px;">
-        ${worksheetLabel}
-      </div>
-      <div style="margin-bottom: 10px;"><strong>Creation Date:</strong> ${creationDate}</div>
-      <div style="margin-bottom: 10px;"><strong>Title:</strong> ${title || 'Untitled'}</div>
-      <div style="margin-bottom: 10px;"><strong>Composer:</strong> ${composer || 'Unknown'}</div>
-    `;
-    container.appendChild(cleanHeader);
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '-9999px';
+  container.style.width = '800px';
+  container.style.backgroundColor = 'white';
+  container.style.padding = '20px';
+  
+  const cleanHeader = document.createElement('div');
+  cleanHeader.innerHTML = `
+    <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 20px;">
+      ${worksheetLabel}
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #ddd;">
+      <span><strong>${creationDateLabel}:</strong> ${creationDate}</span>
+      <span><strong>${titleLabel}:</strong> ${title || 'Untitled'}</span>
+      <span><strong>${composerLabel}:</strong> ${composer || 'Unknown'}</span>
+    </div>
+  `;
+  container.appendChild(cleanHeader);
 
-    // Create table with proper headers for PDF
-    const tableClone = document.createElement('table');
-    tableClone.style.width = '100%';
-    tableClone.style.borderCollapse = 'collapse';
-    tableClone.style.marginTop = '20px';
+  // Create table with proper headers for PDF
+  const tableClone = document.createElement('table');
+  tableClone.style.width = '100%';
+  tableClone.style.borderCollapse = 'collapse';
+  tableClone.style.marginTop = '20px';
+  
+  // Add table headers
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  
+  const imageHeader = document.createElement('th');
+  imageHeader.style.border = '1px solid #ddd';
+  imageHeader.style.padding = '8px';
+  imageHeader.style.textAlign = 'left';
+  imageHeader.style.backgroundColor = '#f5f5f5';
+  imageHeader.style.width = '66.66%'; // 2/3 width for image
+  imageHeader.textContent = intl.formatMessage({ id: 'detailPage.image' });
+  
+  const solutionHeader = document.createElement('th');
+  solutionHeader.style.border = '1px solid #ddd';
+  solutionHeader.style.padding = '8px';
+  solutionHeader.style.textAlign = 'right'; // Right align the header
+  solutionHeader.style.backgroundColor = '#f5f5f5';
+  solutionHeader.style.width = '33.33%'; // 1/3 width for solution
+  solutionHeader.textContent = solutionLabel;
+  
+  headerRow.appendChild(imageHeader);
+  headerRow.appendChild(solutionHeader);
+  thead.appendChild(headerRow);
+  tableClone.appendChild(thead);
+  
+  // Add table body
+  const tbody = document.createElement('tbody');
+  
+  results.forEach((result, index) => {
+    const row = document.createElement('tr');
     
-    // Add table headers
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
+    const imageCell = document.createElement('td');
+    imageCell.style.border = '1px solid #ddd';
+    imageCell.style.padding = '8px';
+    imageCell.style.verticalAlign = 'top';
     
-    const imageHeader = document.createElement('th');
-    imageHeader.style.border = '1px solid #ddd';
-    imageHeader.style.padding = '8px';
-    imageHeader.style.textAlign = 'left';
-    imageHeader.style.backgroundColor = '#f5f5f5';
-    imageHeader.style.width = '50%';
-    imageHeader.textContent = intl.formatMessage({ id: 'detailPage.image' });
+    const img = document.createElement('img');
+    img.src = result.image;
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+    imageCell.appendChild(img);
     
-    const solutionHeader = document.createElement('th');
-    solutionHeader.style.border = '1px solid #ddd';
-    solutionHeader.style.padding = '8px';
-    solutionHeader.style.textAlign = 'left';
-    solutionHeader.style.backgroundColor = '#f5f5f5';
-    solutionHeader.style.width = '50%';
-    solutionHeader.textContent = solutionLabel;
+    const solutionCell = document.createElement('td');
+    solutionCell.style.border = '1px solid #ddd';
+    solutionCell.style.padding = '8px';
+    solutionCell.style.verticalAlign = 'top';
+    solutionCell.style.minHeight = '100px';
+    solutionCell.style.whiteSpace = 'pre-wrap';
+    solutionCell.style.wordBreak = 'break-word';
+    solutionCell.style.textAlign = 'right'; // Right align the solution text
+    solutionCell.style.display = 'flex';
+    solutionCell.style.alignItems = 'flex-start';
+    solutionCell.style.justifyContent = 'flex-end'; // Align content to the right
+    solutionCell.textContent = solutions[result.id] || '';
     
-    headerRow.appendChild(imageHeader);
-    headerRow.appendChild(solutionHeader);
-    thead.appendChild(headerRow);
-    tableClone.appendChild(thead);
-    
-    // Add table body
-    const tbody = document.createElement('tbody');
-    
-    results.forEach((result, index) => {
-      const row = document.createElement('tr');
-      
-      const imageCell = document.createElement('td');
-      imageCell.style.border = '1px solid #ddd';
-      imageCell.style.padding = '8px';
-      imageCell.style.verticalAlign = 'top';
-      
-      const img = document.createElement('img');
-      img.src = result.image;
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-      imageCell.appendChild(img);
-      
-      const solutionCell = document.createElement('td');
-      solutionCell.style.border = '1px solid #ddd';
-      solutionCell.style.padding = '8px';
-      solutionCell.style.verticalAlign = 'top';
-      solutionCell.style.minHeight = '100px';
-      solutionCell.style.whiteSpace = 'pre-wrap';
-      solutionCell.style.wordBreak = 'break-word';
-      solutionCell.textContent = solutions[result.id] || '';
-      
-      row.appendChild(imageCell);
-      row.appendChild(solutionCell);
-      tbody.appendChild(row);
-    });
-    
-    tableClone.appendChild(tbody);
-    container.appendChild(tableClone);
-    document.body.appendChild(container);
+    row.appendChild(imageCell);
+    row.appendChild(solutionCell);
+    tbody.appendChild(row);
+  });
+  
+  tableClone.appendChild(tbody);
+  container.appendChild(tableClone);
+  document.body.appendChild(container);
 
-    html2canvas(container, {
-      backgroundColor: 'white',
-      scale: 2,
-      logging: false,
-      useCORS: true,
-    })
-      .then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const img = new Image();
-        img.src = imgData;
+  html2canvas(container, {
+    backgroundColor: 'white',
+    scale: 2,
+    logging: false,
+    useCORS: true,
+  })
+    .then(canvas => {
+      const imgData = canvas.toDataURL('image/png');
+      const img = new Image();
+      img.src = imgData;
 
-        img.addEventListener('load', function() {
-          const imageHeight = img.naturalHeight;
-          const imageWidth = img.naturalWidth;
-          const titleHeight = 10;
+      img.addEventListener('load', function() {
+        const imageHeight = img.naturalHeight;
+        const imageWidth = img.naturalWidth;
+        const titleHeight = 10;
 
-          const pdf = new jsPDF();
-          const width = pdf.internal.pageSize.getWidth() * 0.9;
-          const height = (width * imageHeight) / imageWidth;
+        const pdf = new jsPDF();
+        const width = pdf.internal.pageSize.getWidth() * 0.9;
+        const height = (width * imageHeight) / imageWidth;
 
-          pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
-          document.body.removeChild(container);
-          
-          // Restore hidden elements
-          for (let i = 0; i < results.length; i++) {
-            const pencil = document.getElementById(`pencil-${i}`);
-            if (pencil) {
-              pencil.style.display = '';
-            }
-          }
-          
-          const filename = `${composer || 'Unknown'} ${title || 'Untitled'} ${creationDate.replace(/\//g, '-')}.pdf`;
-          pdf.save(filename);
-        });
-      })
-      .catch(error => {
-        console.error('Error generating PDF:', error);
-        if (document.body.contains(container)) {
-          document.body.removeChild(container);
-        }
+        pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
+        document.body.removeChild(container);
         
         // Restore hidden elements
         for (let i = 0; i < results.length; i++) {
@@ -396,8 +398,25 @@ const DetailPage = props => {
             pencil.style.display = '';
           }
         }
+        
+        const filename = `${composer || 'Unknown'} ${title || 'Untitled'} ${creationDate.replace(/\//g, '-')}.pdf`;
+        pdf.save(filename);
       });
-  };
+    })
+    .catch(error => {
+      console.error('Error generating PDF:', error);
+      if (document.body.contains(container)) {
+        document.body.removeChild(container);
+      }
+      
+      for (let i = 0; i < results.length; i++) {
+        const pencil = document.getElementById(`pencil-${i}`);
+        if (pencil) {
+          pencil.style.display = '';
+        }
+      }
+    });
+};
 
   const handleEditImageClick = index => {
     setShowImage(index);
@@ -552,8 +571,12 @@ const DetailPage = props => {
                   <TableHead>
                     <TableRow>
                       <TableCell width="20">#</TableCell>
-                      <TableCell>{<IntlMessages id="detailPage.image" />}</TableCell>
-                      <TableCell>{<IntlMessages id="detailPage.solution" />}</TableCell>
+                      <TableCell className={classes.imageColumn}>
+                        {<IntlMessages id="detailPage.image" />}
+                      </TableCell>
+                      <TableCell className={classes.solutionColumn}>
+                        {<IntlMessages id="detailPage.solution" />}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -576,7 +599,7 @@ const DetailPage = props => {
                       >
                         <TableCell>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={classes.imageColumn}>
                           <div className={`jr-card-thumb image-container pb-0 ${classes.imageContainer}`}>
                             <CmtImage id={`second_image${result.id}`} src={result.image} style={{ objectFit: 'cover' }} />
                             <IconButton
@@ -589,13 +612,16 @@ const DetailPage = props => {
                             </IconButton>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={classes.solutionColumn}>
                           <TextField
+                            fullWidth
                             multiline
                             variant="outlined"
                             placeholder="Write your solution here..."
                             value={solutions[result.id] || ''}
                             onChange={(e) => handleSolutionChange(result.id, e.target.value)}
+                            rows={4}
+                            style={{ minHeight: '100px' }}
                           />
                         </TableCell>
                       </TableRow>

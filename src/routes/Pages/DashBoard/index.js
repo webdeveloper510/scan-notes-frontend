@@ -248,28 +248,27 @@ const DashBoard = props => {
 
     dispatch(fetchStart());
 
-    $http
-      .post(`${baseURL}recognize_image/`, eventData)
-      .then(response => {
-        if (response.data.status) {
-          dispatch(fetchSuccess('Success!'));
-          let newSelectedImageURL = [...selectedImageURL];
-          newSelectedImageURL.forEach((item, index) => {
-            item.source = response.data.sheet_wav_data[index];
-            item.solution = response.data.sheet_music_data[index];
-          });
-          setSelectedImageURL(newSelectedImageURL);
-          setGotoDetail(true);
-        } else {
-          dispatch(fetchError(response.data.error));
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        setLoading(false);
-        dispatch(fetchError(error.message));
+   $http
+  .post(`${baseURL}recognize_image/`, eventData)
+  .then(response => {
+    if (response.data.status === 200) {
+      dispatch(fetchSuccess('Success!'));
+      let newSelectedImageURL = [...selectedImageURL];
+      newSelectedImageURL.forEach((item, index) => {
+        // item.source = response.data.data.sheet_wav_data[index];
+        // item.solution = response.data.data.sheet_music_data[index];
       });
-  };
+      setSelectedImageURL(newSelectedImageURL);
+      setGotoDetail(true);
+    } else {
+      dispatch(fetchError(response.data.error));
+    }
+    setLoading(false);
+  })
+  .catch(error => {
+    setLoading(false);
+    dispatch(fetchError(error.message));
+  });}
   const handleDragStart = (e, item) => {
     setDraggedItem(item);
     e.dataTransfer.effectAllowed = 'move';
@@ -383,29 +382,32 @@ const DashBoard = props => {
       loadPdfFile(photo_img, newPageNumber);
     }
   };
-
-  const handleFileInputChange = fileObj => {
-    if (fileObj && fileObj.type === 'application/pdf') {
-      setPhotoImg(fileObj);
-      loadPdfFile(fileObj, 1);
-    } else if (fileObj && fileObj.type.startsWith('image/')) {
-      setPhotoImg(fileObj);
-      setNumPages(0);
-      setCurrentPage(1);
-      loadImageFile(fileObj);
-      const newImage = {
-        id: selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1,
-        image: URL.createObjectURL(fileObj),
-        file: fileObj,
-        source: undefined,
-        solution: undefined,
-      };
-      setSelectedImageURL(prevImages => [...prevImages, newImage]);
-    } else {
-      dispatch(fetchError('Invalid file format'));
-    }
-    fileObj = null;
-  };
+const handleFileInputChange = fileObj => {
+  if (fileObj && fileObj.type === 'application/pdf') {
+    setPhotoImg(fileObj);
+    loadPdfFile(fileObj, 1);
+  } else if (fileObj && fileObj.type.startsWith('image/')) {
+    setPhotoImg(fileObj);
+    setNumPages(0);
+    setCurrentPage(1);
+    loadImageFile(fileObj);
+    
+    // DON'T add the uploaded image to selectedImageURL - only show on canvas
+    // Remove these lines:
+    // const newImage = { ... };
+    // setSelectedImageURL(prevImages => [...prevImages, newImage]);
+    
+    setGotoDetail(false);
+  } else {
+    dispatch(fetchError('Invalid file format'));
+  }
+  
+  // Clear the file input
+  const fileInput = document.getElementById('photo_img');
+  if (fileInput) {
+    fileInput.value = '';
+  }
+};
 
   const handleMouseDown = e => {
     const canvas = canvasRef.current;

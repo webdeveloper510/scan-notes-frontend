@@ -719,5 +719,6 @@
   "detailPage.date": "Creation Date",
   "detailPage.image": "passages selections",
   "detailPage.solution": "Solution",
-  "dashboard.imageTitle":"Selection of passages"
+  "dashboard.imageTitle":"Selection of passages",
+  "detailPage.creationDate": "Creation Date"
 }

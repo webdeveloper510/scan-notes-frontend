@@ -710,8 +710,8 @@
   "detailpage.Title": "Titre",
 "detailPage.composer": "Compositeur",
 "detailPage.date": "Date de création",
-"detailPage.image": "sélections passages",
+"detailPage.image": "passages sélections ",
 "detailPage.solution": "Solution",
-"dashboard.imageTitle": "Sélection de passages"
-
+"dashboard.imageTitle": "Sélection de passages",
+"detailPage.creationDate": " Crée-le"
 }
