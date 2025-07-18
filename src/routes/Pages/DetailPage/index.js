@@ -68,6 +68,8 @@ const useStyles = makeStyles(theme => ({
   },
   imageContainer: {
     position: 'relative',
+    margin: 0, // Remove vertical margin
+    padding: 0, // Remove padding
   },
   editImage: {
     position: 'absolute',
@@ -117,12 +119,13 @@ const useStyles = makeStyles(theme => ({
   },
   // New styles for column widths
   imageColumn: {
-    width: '66.66%', // 2/3 of the available width
-    minWidth: '400px', // Minimum width to ensure images are visible
+    minWidth: '300px', 
+    maxWidth: '70%', 
+    width: 'auto',
   },
   solutionColumn: {
-    width: '33.33%', // 1/3 of the available width
-    minWidth: '200px', // Minimum width for solution text
+    minWidth: '200px', 
+    width: 'auto', 
   },
 }));
 
@@ -268,8 +271,7 @@ const handleDownloadClick = () => {
   const table = document.getElementById('scan-table');
   const headerInfo = document.getElementById('header-info');
   const rows = table.getElementsByTagName('tr');
-  
-  // Hide solution column buttons for PDF
+
   for (let i = 0; i < results.length; i++) {
     const pencil = document.getElementById(`pencil-${i}`);
     if (pencil) {
@@ -284,7 +286,7 @@ const handleDownloadClick = () => {
   container.style.width = '800px';
   container.style.backgroundColor = 'white';
   container.style.padding = '20px';
-  
+
   const cleanHeader = document.createElement('div');
   cleanHeader.innerHTML = `
     <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 20px;">
@@ -303,67 +305,67 @@ const handleDownloadClick = () => {
   tableClone.style.width = '100%';
   tableClone.style.borderCollapse = 'collapse';
   tableClone.style.marginTop = '20px';
-  
+
   // Add table headers
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  
+
   const imageHeader = document.createElement('th');
   imageHeader.style.border = '1px solid #ddd';
   imageHeader.style.padding = '8px';
-  imageHeader.style.textAlign = 'left';
+  imageHeader.style.textAlign = 'center';
   imageHeader.style.backgroundColor = '#f5f5f5';
-  imageHeader.style.width = '66.66%'; // 2/3 width for image
+  imageHeader.style.width = '66.66%';
   imageHeader.textContent = intl.formatMessage({ id: 'detailPage.image' });
-  
+
   const solutionHeader = document.createElement('th');
   solutionHeader.style.border = '1px solid #ddd';
   solutionHeader.style.padding = '8px';
-  solutionHeader.style.textAlign = 'right'; // Right align the header
+  solutionHeader.style.textAlign = 'center';
   solutionHeader.style.backgroundColor = '#f5f5f5';
-  solutionHeader.style.width = '33.33%'; // 1/3 width for solution
+  solutionHeader.style.width = '33.33%';
   solutionHeader.textContent = solutionLabel;
-  
+
   headerRow.appendChild(imageHeader);
   headerRow.appendChild(solutionHeader);
   thead.appendChild(headerRow);
   tableClone.appendChild(thead);
-  
+
   // Add table body
   const tbody = document.createElement('tbody');
-  
+
   results.forEach((result, index) => {
     const row = document.createElement('tr');
-    
+
+    // Image cell
     const imageCell = document.createElement('td');
     imageCell.style.border = '1px solid #ddd';
     imageCell.style.padding = '8px';
     imageCell.style.verticalAlign = 'top';
-    
+    imageCell.style.width = '66.66%';
+
     const img = document.createElement('img');
     img.src = result.image;
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     imageCell.appendChild(img);
-    
+
+    // Solution cell
     const solutionCell = document.createElement('td');
     solutionCell.style.border = '1px solid #ddd';
     solutionCell.style.padding = '8px';
-    solutionCell.style.verticalAlign = 'top';
-    solutionCell.style.minHeight = '100px';
+    solutionCell.style.verticalAlign = 'middle';
     solutionCell.style.whiteSpace = 'pre-wrap';
     solutionCell.style.wordBreak = 'break-word';
-    solutionCell.style.textAlign = 'right'; // Right align the solution text
-    solutionCell.style.display = 'flex';
-    solutionCell.style.alignItems = 'flex-start';
-    solutionCell.style.justifyContent = 'flex-end'; // Align content to the right
+    solutionCell.style.textAlign = 'center';
+    solutionCell.style.width = '33.33%';
     solutionCell.textContent = solutions[result.id] || '';
-    
+
     row.appendChild(imageCell);
     row.appendChild(solutionCell);
     tbody.appendChild(row);
   });
-  
+
   tableClone.appendChild(tbody);
   container.appendChild(tableClone);
   document.body.appendChild(container);
@@ -379,7 +381,7 @@ const handleDownloadClick = () => {
       const img = new Image();
       img.src = imgData;
 
-      img.addEventListener('load', function() {
+      img.addEventListener('load', function () {
         const imageHeight = img.naturalHeight;
         const imageWidth = img.naturalWidth;
         const titleHeight = 10;
@@ -390,15 +392,14 @@ const handleDownloadClick = () => {
 
         pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
         document.body.removeChild(container);
-        
-        // Restore hidden elements
+
         for (let i = 0; i < results.length; i++) {
           const pencil = document.getElementById(`pencil-${i}`);
           if (pencil) {
             pencil.style.display = '';
           }
         }
-        
+
         const filename = `${composer || 'Unknown'} ${title || 'Untitled'} ${creationDate.replace(/\//g, '-')}.pdf`;
         pdf.save(filename);
       });
@@ -408,7 +409,7 @@ const handleDownloadClick = () => {
       if (document.body.contains(container)) {
         document.body.removeChild(container);
       }
-      
+
       for (let i = 0; i < results.length; i++) {
         const pencil = document.getElementById(`pencil-${i}`);
         if (pencil) {
@@ -494,10 +495,29 @@ const handleDownloadClick = () => {
   return (
     <PageContainer heading={<IntlMessages id="detailPage.worksheet" />} breadcrumbs={breadcrumbs}>
       <style>{`
-      .MuiTableCell-root{
-      padding: 1px 16px 0px 16px !important
-    }
-    `}</style>
+        .MuiTableCell-root {
+          padding: 0px 16px !important;
+        }
+        .MuiTableCell-head {
+          padding: 12px 16px !important;
+        }
+        .MuiTableRow-root {
+          height: auto !important;
+        }
+        .image-container {
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+        .jr-card-thumb {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        .MuiTableCell-root .jr-card-thumb img {
+          display: block !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      `}</style>
       <GridContainer>
         <Grid item xs={12}>
           <CmtCard className={classes.cardRoot}>
