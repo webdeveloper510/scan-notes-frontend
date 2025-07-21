@@ -707,12 +707,15 @@
   "detailPage.title": "Resultados",
   "detailPage.worksheet": "Hoja de trabajo",
   "detailPage.worksheett": "HOJA DE TRABAJO",
-
   "detailpage.Title": "Título",
 "detailPage.composer": "Compositor",
 "detailPage.date": "Fecha de creación",
 "detailPage.image": "selecciones de pasajes",
 "detailPage.solution": "Solución",
-"dashboard.imageTitle": "Selección de pasajes"
+"dashboard.imageTitle": "Selección de pasajes",
+"dashboard.freeTrial": "Necesitas una suscripción activa para subir imágenes. Por favor, compra un plan para seguir utilizando esta función.",
+"dashboard.buysubscription": "Comprar suscripción",
+"dashboard.cancel": "Cancelar",
+"sidebar.history": "Historial"
 
 }

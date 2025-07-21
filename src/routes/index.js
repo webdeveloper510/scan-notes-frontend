@@ -10,6 +10,8 @@ import Register from './Auth/Register';
 import ForgotPasswordPage from './Auth/ForgotPassword';
 import ForgotPassword from '@jumbo/components/Common/authComponents/ForgotPassword';
 import ResetPassword from '@jumbo/components/Common/authComponents/ResetPassword';
+import SubscriptionPage from './Pages/subscription';
+import HistoryPage from './Pages/history';
 
 const RestrictedRoute = ({ component: Component, ...rest }) => {
   const { authUser } = useSelector(({ auth }) => auth);
@@ -50,6 +52,8 @@ const Routes = () => {
         <Route path="/signin" component={Login} />
         <Route path="/signup" component={Register} />
         <Route path="/forgot-password/:token?" component={ForgotPassword} />
+        <Route path="/subscription" component={SubscriptionPage}/>
+        <Route path="/history" component={HistoryPage} />
         <Route component={Error404} />
       </Switch>
     </React.Fragment>

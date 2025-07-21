@@ -703,15 +703,18 @@
   "dashboard.scan": "Scansiona",
   "dashboard.sheet": "Spartito",
   "dashboard.submit": "convalidare le selezioni",
- "dashboard.goto": "Genera il foglio di lavoro",
+  "dashboard.goto": "Genera il foglio di lavoro",
   "detailPage.title": "Risultati",
   "detailPage.worksheet": "Foglio di lavoro",
   "detailPage.worksheett": "FOGLIO DI LAVORO",
   "detailpage.Title": "Titolo",
   "detailPage.composer": "Compositore",
   "detailPage.date": "Data di creazione",
-"detailPage.image": "selezioni di passaggi",
-"detailPage.solution": "Soluzione",
-"dashboard.imageTitle": "Selezione dei passaggi"
-
+  "detailPage.image": "selezioni di passaggi",
+  "detailPage.solution": "Soluzione",
+  "dashboard.imageTitle": "Selezione dei passaggi",
+  "dashboard.freeTrial": "È necessario un abbonamento attivo per caricare immagini. Acquista un piano per continuare a utilizzare questa funzionalità.",
+  "dashboard.buysubscription": "Acquista abbonamento",
+  "dashboard.cancel": "Annulla",
+  "sidebar.history": "Cronologia"
 }

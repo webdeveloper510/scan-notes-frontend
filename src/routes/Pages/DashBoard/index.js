@@ -46,7 +46,8 @@ import CmtCardHeader from '../../../@coremat/CmtCard/CmtCardHeader';
 import clsx from 'clsx';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
-
+import { freeTrialCheck ,deleteHistory} from 'services/auth/Basic/api';
+import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 const breadcrumbs = [
   { label: <IntlMessages id={'sidebar.main'} />, link: '/' },
   { label: <IntlMessages id={'sidebar.dashboard'} />, isActive: true },
@@ -150,10 +151,18 @@ const DashBoard = props => {
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [photo_img_url, setPhotoImgUrl] = useState('https://via.placeholder.com/600x400');
-  const [selectedImageURL, setSelectedImageURL] = useState(
-    props.location.state && props.location.state.selectedImageURL ? props.location.state.selectedImageURL : [],
-  );
+  const [hasFreeTrial, setHasFreeTrial] = useState(null);
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
+  const [photo_img_url, setPhotoImgUrl] = useState(
+  props.location.state && props.location.state.selectedImageURL_url 
+    ? props.location.state.selectedImageURL_url 
+    : 'https://via.placeholder.com/600x400'
+);
+const [selectedImageURL, setSelectedImageURL] = useState(
+  props.location.state && props.location.state.selectedImageURL 
+    ? props.location.state.selectedImageURL 
+    : []
+);
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -175,100 +184,195 @@ const DashBoard = props => {
   const [scale, setScale] = useState(1);
   const [zoomFocus, setZoomFocus] = useState(false);
   let isImageLoading = false;
-
-  useEffect(() => {
-    const imageContainer = document.querySelector('#image-container');
-    const myCanvas = document.querySelector('#myCanvas');
-    const enlargedImage = document.querySelector('#enlarged-image');
-    enlargedImage.style.backgroundImage = `url(${photo_img_url})`;
-    enlargedImage.style.transform = 'scale(2)';
-
+  const location = useLocation();
+const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const fetchHistoryItemById = async (historyId) => {
+  try {
+    const response = await $http.get(`${baseURL}user-history/`);
+    if (response.data.status === 200) {
+      const historyItem = response.data.data.find(item => item.id === parseInt(historyId));
+      return historyItem;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching history item:', error);
+    return null;
+  }
+};
+useEffect(() => {
+  const imageContainer = document.querySelector('#image-container');
+  const myCanvas = document.querySelector('#myCanvas');
+  const enlargedImage = document.querySelector('#enlarged-image');
+  if (myCanvas) {
     myCanvas.addEventListener('mousemove', function(event) {
       const mouseX = event.clientX;
       const mouseY = event.clientY;
       const rect = imageContainer.getBoundingClientRect();
       const canvas_rect = myCanvas.getBoundingClientRect();
-      enlargedImage.style.top = `${mouseY - rect.top - 100 + imageContainer.scrollTop}px`;
-      enlargedImage.style.left = `${mouseX - rect.left - 100 + imageContainer.scrollLeft}px`;
-      enlargedImage.style.display = 'block';
-      enlargedImage.style.backgroundPositionX = `${-(mouseX - canvas_rect.left - 100)}px`;
-      enlargedImage.style.backgroundPositionY = `${-(mouseY - canvas_rect.top - 100)}px`;
-    });
-    imageContainer.addEventListener('mouseout', function() {
-      enlargedImage.style.display = 'none';
-    });
-    if (photo_img) handleFileInputChange(photo_img);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-
-    img.onload = function() {
-      const originalWidth = img.naturalWidth || img.width;
-      const originalHeight = img.naturalHeight || img.height;
-      const maxWidth = 1800;
-      const maxHeight = 1200;
-
-      let canvasWidth = originalWidth;
-      let canvasHeight = originalHeight;
-      if (originalWidth > maxWidth || originalHeight > maxHeight) {
-        const widthRatio = maxWidth / originalWidth;
-        const heightRatio = maxHeight / originalHeight;
-        const ratio = Math.min(widthRatio, heightRatio);
-
-        canvasWidth = originalWidth * ratio;
-        canvasHeight = originalHeight * ratio;
+      if (enlargedImage) {
+        enlargedImage.style.top = `${mouseY - rect.top - 100 + imageContainer.scrollTop}px`;
+        enlargedImage.style.left = `${mouseX - rect.left - 100 + imageContainer.scrollLeft}px`;
+        enlargedImage.style.display = 'block';
+        enlargedImage.style.backgroundPositionX = `${-(mouseX - canvas_rect.left - 100)}px`;
+        enlargedImage.style.backgroundPositionY = `${-(mouseY - canvas_rect.top - 100)}px`;
       }
-      canvas.width = canvasWidth;
-      canvas.height = canvasHeight;
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
-    };
-
-    img.src = photo_img_url;
-  }, [photo_img_url]);
-  const handleSubmitClick = () => {
-    if (!photo_img) {
-      setMessage('You need to select the image.');
-      setShowMessage(true);
-      return;
-    }
-
-    setLoading(true);
-
-    const eventData = new FormData();
-    eventData.append('photo_img', photo_img);
-    selectedImageURL.forEach((file, index) => {
-      eventData.append(`selectedImageURL`, file.file);
     });
+  }
 
-    dispatch(fetchStart());
+  if (imageContainer) {
+    imageContainer.addEventListener('mouseout', function() {
+      if (enlargedImage) {
+        enlargedImage.style.display = 'none';
+      }
+    });
+  }
+  const urlParams = new URLSearchParams(location.search);
+  const historyId = urlParams.get('id');
 
-   $http
-  .post(`${baseURL}recognize_image/`, eventData)
-  .then(response => {
-    if (response.data.status === 200) {
-      dispatch(fetchSuccess('Success!'));
-      let newSelectedImageURL = [...selectedImageURL];
-      newSelectedImageURL.forEach((item, index) => {
-        // item.source = response.data.data.sheet_wav_data[index];
-        // item.solution = response.data.data.sheet_music_data[index];
-      });
-      setSelectedImageURL(newSelectedImageURL);
-      setGotoDetail(true);
-    } else {
-      dispatch(fetchError(response.data.error));
+  if (historyId) {
+    loadHistoryItem(historyId);
+  } else if (props.location.state && props.location.state.fromHistory) {
+    if (props.location.state.selectedImageURL_url) {
+      setPhotoImgUrl(props.location.state.selectedImageURL_url);
     }
-    setLoading(false);
-  })
-  .catch(error => {
-    setLoading(false);
-    dispatch(fetchError(error.message));
-  });}
+  } else if (photo_img) {
+    handleFileInputChange(photo_img);
+  }
+}, [location.search]);
+const loadHistoryItem = async (historyId) => {
+  setIsLoadingHistory(true);
+  try {
+    const historyItem = await fetchHistoryItemById(historyId);
+    if (historyItem) {
+      setPhotoImgUrl(historyItem.orignal_image);
+      const convertedImages = historyItem.crop_images.map((cropImg, index) => ({
+        id: index + 1,
+        image: cropImg.file_url,
+        file: null,
+        source: undefined,
+        solution: undefined,
+        fileName: cropImg.file_name,
+        isFromHistory: true
+      }));
+      
+      setSelectedImageURL(convertedImages);
+      setGotoDetail(convertedImages.length > 0);
+      try {
+        const response = await fetch(historyItem.orignal_image);
+        const blob = await response.blob();
+        const file = new File([blob], 'original_image.jpg', { type: blob.type });
+        setPhotoImg(file);
+        setTimeout(() => {
+          if (canvasRef.current) {
+            redrawCanvasFromImage(historyItem.orignal_image);
+          }
+        }, 100);
+        
+      } catch (error) {
+        console.error('Error creating file from URL:', error)
+        setTimeout(() => {
+          if (canvasRef.current) {
+            redrawCanvasFromImage(historyItem.orignal_image);
+          }
+        }, 100);
+      }
+
+    } else {
+      dispatch(fetchError('History item not found'));
+    }
+  } catch (error) {
+    dispatch(fetchError('Error loading history item'));
+    console.error('Error loading history item:', error);
+  } finally {
+    setIsLoadingHistory(false);
+  }
+};
+useEffect(() => {
+  const canvas = canvasRef.current;
+  if (!canvas || !photo_img_url) return;
+  if (isLoadingHistory) return;
+  
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+
+  img.onload = function() {
+    const originalWidth = img.naturalWidth || img.width;
+    const originalHeight = img.naturalHeight || img.height;
+    const maxWidth = 1800;
+    const maxHeight = 1200;
+
+    let canvasWidth = originalWidth;
+    let canvasHeight = originalHeight;
+    if (originalWidth > maxWidth || originalHeight > maxHeight) {
+      const widthRatio = maxWidth / originalWidth;
+      const heightRatio = maxHeight / originalHeight;
+      const ratio = Math.min(widthRatio, heightRatio);
+
+      canvasWidth = originalWidth * ratio;
+      canvasHeight = originalHeight * ratio;
+    }
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+  };
+
+  img.onerror = function() {
+    console.error('Failed to load image:', photo_img_url);
+  };
+
+  img.crossOrigin = 'anonymous';
+  img.src = photo_img_url;
+}, [photo_img_url, isLoadingHistory]); 
+const handleSubmitClick = () => {
+  if (!photo_img) {
+    setMessage('You need to select the image.');
+    setShowMessage(true);
+    return;
+  }
+
+  setLoading(true);
+
+  const eventData = new FormData();
+  eventData.append('photo_img', photo_img);
+  
+  // Get history ID from URL parameters if coming from history
+  const urlParams = new URLSearchParams(location.search);
+  const historyId = urlParams.get('id');
+  if (historyId) {
+    eventData.append('object_id', historyId);
+  }
+  
+  selectedImageURL.forEach((file, index) => {
+    eventData.append(`selectedImageURL`, file.file);
+  });
+
+  dispatch(fetchStart());
+
+  $http
+    .post(`${baseURL}recognize_image/`, eventData)
+    .then(response => {
+      if (response.data.status === 200) {
+        dispatch(fetchSuccess('Success!'));
+        let newSelectedImageURL = [...selectedImageURL];
+        newSelectedImageURL.forEach((item, index) => {
+          // item.source = response.data.data.sheet_wav_data[index];
+          // item.solution = response.data.data.sheet_music_data[index];
+        });
+        setSelectedImageURL(newSelectedImageURL);
+        setGotoDetail(true);
+      } else {
+        dispatch(fetchError(response.data.error));
+      }
+      setLoading(false);
+    })
+    .catch(error => {
+      setLoading(false);
+      dispatch(fetchError(error.message));
+    });
+};
   const handleDragStart = (e, item) => {
     setDraggedItem(item);
     e.dataTransfer.effectAllowed = 'move';
@@ -286,7 +390,6 @@ const DashBoard = props => {
   };
 
   const handleDragLeave = e => {
-    // Only clear dragOverItem if we're actually leaving the item
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setDragOverItem(null);
     }
@@ -304,11 +407,7 @@ const DashBoard = props => {
     const newImageArray = [...selectedImageURL];
     const draggedIndex = newImageArray.findIndex(item => item.id === draggedItem.id);
     const targetIndex = newImageArray.findIndex(item => item.id === targetItem.id);
-
-    // Remove the dragged item
     const [draggedItemData] = newImageArray.splice(draggedIndex, 1);
-
-    // Insert it at the target position
     newImageArray.splice(targetIndex, 0, draggedItemData);
 
     setSelectedImageURL(newImageArray);
@@ -331,12 +430,12 @@ const DashBoard = props => {
   const handleMessageClose = () => () => {
     setShowMessage(false);
   };
-
-  const loadImageFile = file => {
-    let img_file_name = file.name;
-    file = new File([file], img_file_name, file);
-    setPhotoImgUrl(URL.createObjectURL(file));
-  };
+const loadImageFile = file => {
+  let img_file_name = file.name;
+  file = new File([file], img_file_name, file);
+  const imageUrl = URL.createObjectURL(file);
+  setPhotoImgUrl(imageUrl);
+};
 
   const loadPdfFile = async (file, pageNumber) => {
     try {
@@ -382,148 +481,225 @@ const DashBoard = props => {
       loadPdfFile(photo_img, newPageNumber);
     }
   };
-const handleFileInputChange = fileObj => {
-  if (fileObj && fileObj.type === 'application/pdf') {
-    setPhotoImg(fileObj);
-    loadPdfFile(fileObj, 1);
-  } else if (fileObj && fileObj.type.startsWith('image/')) {
-    setPhotoImg(fileObj);
+  const handleFileInputChange = async fileObj => {
+    try {
+      const response = await freeTrialCheck();
+      if (response.status !== 200 || response.trial !== true) {
+        setHasFreeTrial(false);
+        setShowSubscriptionDialog(true);
+        const fileInput = document.getElementById('photo_img');
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        return;
+      }
+      setHasFreeTrial(true);
+    } catch (error) {
+      console.error('Error checking free trial:', error);
+      setHasFreeTrial(false);
+      setShowSubscriptionDialog(true);
+      const fileInput = document.getElementById('photo_img');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+      return;
+    }
+
+    if (fileObj && fileObj.type === 'application/pdf') {
+      setPhotoImg(fileObj);
+      loadPdfFile(fileObj, 1);
+    } else if (fileObj?.type?.startsWith?.('image/')) {
+       setPhotoImg(fileObj);
     setNumPages(0);
     setCurrentPage(1);
     loadImageFile(fileObj);
-    
-    // DON'T add the uploaded image to selectedImageURL - only show on canvas
-    // Remove these lines:
-    // const newImage = { ... };
-    // setSelectedImageURL(prevImages => [...prevImages, newImage]);
-    
     setGotoDetail(false);
   } else {
     dispatch(fetchError('Invalid file format'));
   }
-  
-  // Clear the file input
+
   const fileInput = document.getElementById('photo_img');
   if (fileInput) {
     fileInput.value = '';
   }
 };
+const handleMouseDown = e => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  
+  const rect = canvas.getBoundingClientRect();
 
-  const handleMouseDown = e => {
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
+  // Get mouse position relative to the canvas element
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-    // Get mouse position relative to the canvas element (not the canvas coordinate system)
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  setIsDragging(true);
+  setStartX(x);
+  setStartY(y);
+  setEndX(x);
+  setEndY(y);
+  
+  // Prevent default to avoid any browser drag behavior
+  e.preventDefault();
+};
 
-    setIsDragging(true);
-    setStartX(x);
-    setStartY(y);
+const handleMouseMove = e => {
+  const enlargedImage = document.querySelector('#enlarged-image');
+  const canvas = canvasRef.current;
+  const rect = canvas.getBoundingClientRect();
+
+  // Get current mouse position relative to canvas element
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // Handle zoom focus display logic (only when not dragging)
+  if (!isDragging) {
+    if (!zoomFocus) {
+      if (enlargedImage) enlargedImage.style.display = 'none';
+    } else {
+      if (enlargedImage) enlargedImage.style.display = 'block';
+    }
+  } else {
+    // Hide enlarged image while dragging
+    if (enlargedImage) enlargedImage.style.display = 'none';
+  }
+
+  // Handle drag selection
+  if (isDragging) {
     setEndX(x);
     setEndY(y);
-  };
-  const handleMouseMove = e => {
-    const enlargedImage = document.querySelector('#enlarged-image');
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
+    // Call redrawCanvas to show the selection rectangle
+    requestAnimationFrame(() => {
+      redrawCanvas(true);
+    });
+  }
+};
 
-    // Get current mouse position relative to canvas element
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+const handleMouseUp = () => {
+  const enlargedImage = document.querySelector('#enlarged-image');
 
-    // Handle zoom focus display logic (only when not dragging)
-    if (!isDragging) {
-      if (!zoomFocus) {
-        enlargedImage.style.display = 'none';
-      } else {
-        enlargedImage.style.display = 'block';
-      }
-    } else {
-      // Hide enlarged image while dragging
-      enlargedImage.style.display = 'none';
+  if (isDragging) {
+    setIsDragging(false);
+
+    // Calculate the selection area in canvas element coordinates
+    const actualStartX = Math.min(startX, endX);
+    const actualStartY = Math.min(startY, endY);
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
+
+    // Only extract if there's a meaningful selection (minimum 10x10 pixels)
+    if (width > 10 && height > 10) {
+      extractSelectedArea(actualStartX, actualStartY, width, height);
     }
 
-    // Handle drag selection
-    if (isDragging) {
-      setEndX(x);
-      setEndY(y);
-      redrawCanvas();
-    }
-  };
-  const handleMouseUp = () => {
-    const enlargedImage = document.querySelector('#enlarged-image');
-
-    if (isDragging) {
-      setIsDragging(false);
-
-      // Calculate the selection area in canvas element coordinates
-      const actualStartX = Math.min(startX, endX);
-      const actualStartY = Math.min(startY, endY);
-      const width = Math.abs(endX - startX);
-      const height = Math.abs(endY - startY);
-
-      // Only extract if there's a meaningful selection (minimum 10x10 pixels)
-      if (width > 10 && height > 10) {
-        extractSelectedArea(actualStartX, actualStartY, width, height);
-      }
-
-      // Clear the selection rectangle
+    // Clear the selection rectangle by redrawing without selection
+    setTimeout(() => {
       redrawCanvas(false);
-
+      
+      // Update enlarged image background
       try {
         const canvas = canvasRef.current;
-        enlargedImage.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg')})`;
+        if (enlargedImage && canvas) {
+          enlargedImage.style.backgroundImage = `url(${canvas.toDataURL('image/jpeg')})`;
+        }
       } catch (error) {
-        console.log(error);
+        console.log('Error updating enlarged image:', error);
       }
-    }
+    }, 50);
+  }
 
-    // Restore zoom focus display if enabled
-    if (zoomFocus) {
-      enlargedImage.style.display = 'block';
-    } else {
-      enlargedImage.style.display = 'none';
-    }
-  };
+  // Restore zoom focus display if enabled
+  if (zoomFocus && enlargedImage) {
+    enlargedImage.style.display = 'block';
+  } else if (enlargedImage) {
+    enlargedImage.style.display = 'none';
+  }
+};
 
   const redrawCanvas = (showSelection = true) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const img = new Image();
-    img.onload = function() {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const img = new Image();
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    if (showSelection && isDragging && startX !== endX && startY !== endY) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
 
-      // Draw selection rectangle if dragging
-      if (showSelection && isDragging) {
-        const rect = canvas.getBoundingClientRect();
+      const actualStartX = Math.min(startX, endX) * scaleX;
+      const actualStartY = Math.min(startY, endY) * scaleY;
+      const width = Math.abs(endX - startX) * scaleX;
+      const height = Math.abs(endY - startY) * scaleY;
+      ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)'; 
+      ctx.lineWidth = 2;
+      ctx.strokeRect(actualStartX, actualStartY, width, height);
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+      ctx.fillRect(actualStartX, actualStartY, width, height);
+    }
+  };
+  
+  img.onerror = function() {
+    console.error('Failed to load image for redraw:', photo_img_url);
+  };
+  
+  img.crossOrigin = 'anonymous';
+  img.src = photo_img_url;
+};
 
-        // Convert element coordinates to canvas coordinates
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+const redrawCanvasFromImage = (imageUrl) => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
 
-        const actualStartX = Math.min(startX, endX) * scaleX;
-        const actualStartY = Math.min(startY, endY) * scaleY;
-        const width = Math.abs(endX - startX) * scaleX;
-        const height = Math.abs(endY - startY) * scaleY;
+  img.onload = function() {
+    const originalWidth = img.naturalWidth || img.width;
+    const originalHeight = img.naturalHeight || img.height;
+    const maxWidth = 1800;
+    const maxHeight = 1200;
 
-        ctx.strokeStyle = 'rgba(0, 0, 255, 0.5)';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(actualStartX, actualStartY, width, height);
-      }
-    };
-    img.src = photo_img_url;
+    let canvasWidth = originalWidth;
+    let canvasHeight = originalHeight;
+    if (originalWidth > maxWidth || originalHeight > maxHeight) {
+      const widthRatio = maxWidth / originalWidth;
+      const heightRatio = maxHeight / originalHeight;
+      const ratio = Math.min(widthRatio, heightRatio);
+
+      canvasWidth = originalWidth * ratio;
+      canvasHeight = originalHeight * ratio;
+    }
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight);
+    
+    // Update enlarged image background
+    const enlargedImage = document.querySelector('#enlarged-image');
+    if (enlargedImage) {
+      enlargedImage.style.backgroundImage = `url(${imageUrl})`;
+    }
   };
 
+  img.onerror = function() {
+    console.error('Failed to load image:', imageUrl);
+  };
+
+  img.crossOrigin = 'anonymous';
+  img.src = imageUrl;
+};
 const extractSelectedArea = (startXPos, startYPos, width, height) => {
   try {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-
-    // Convert element coordinates to canvas coordinates
+    const rect = canvas.getBoundingClientRect()
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
@@ -531,32 +707,35 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
     const canvasStartY = startYPos * scaleY;
     const canvasWidth = width * scaleX;
     const canvasHeight = height * scaleY;
-
-    // Create a clean canvas with just the original image (no selection rectangle)
     const cleanCanvas = document.createElement('canvas');
     const cleanCtx = cleanCanvas.getContext('2d');
-    
+
     cleanCanvas.width = canvas.width;
     cleanCanvas.height = canvas.height;
-    
-    // Draw the original image without any selection rectangle
+
     const img = new Image();
     img.onload = function() {
       cleanCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      
-      // Now create the cropped image from the clean canvas
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
 
       tempCanvas.width = canvasWidth;
       tempCanvas.height = canvasHeight;
 
-      // Extract the selected area from the clean canvas
-      tempCtx.drawImage(cleanCanvas, canvasStartX, canvasStartY, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
+      tempCtx.drawImage(
+        cleanCanvas,
+        canvasStartX,
+        canvasStartY,
+        canvasWidth,
+        canvasHeight,
+        0,
+        0,
+        canvasWidth,
+        canvasHeight,
+      );
 
       const blob = dataURLtoBlob(tempCanvas.toDataURL('image/png'));
-      const file = new File([blob], 'image.png', { type: 'image/png' });
-
+      const file = new File([blob], 'cropped_image.png', { type: 'image/png' });
       const new_id = selectedImageURL.length > 0 ? Math.max(...selectedImageURL.map(item => item.id)) + 1 : 1;
 
       setSelectedImageURL(prevImages => [
@@ -567,16 +746,19 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
           file: file,
           source: undefined,
           solution: undefined,
+          isFromHistory: false 
         },
       ]);
       setGotoDetail(false);
     };
-    
+
+    img.crossOrigin = 'anonymous';
     img.src = photo_img_url;
   } catch (error) {
     console.log('Error extracting selected area:', error);
   }
 };
+
   const dataURLtoBlob = dataURL => {
     const parts = dataURL.split(';base64,');
     const contentType = parts[0].split(':')[1];
@@ -598,16 +780,40 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
       return null;
     }
   };
-  const handleDeleteImage = id => {
-    const new_img_arr = [...selectedImageURL];
-    const indexToDelete = new_img_arr.findIndex(item => item.id == id);
-    if (indexToDelete !== -1) {
-      new_img_arr.splice(indexToDelete, 1);
-    }
-    setSelectedImageURL(new_img_arr);
-    setGotoDetail(false);
-  };
+const handleDeleteImage = async (id, isFullObject = false) => {
+  const new_img_arr = [...selectedImageURL];
+  const indexToDelete = new_img_arr.findIndex(item => item.id === id);
+   const urlParams = new URLSearchParams(location.search);
+  const historyId = urlParams.get('id');
+  const obj_id =historyId;
 
+  // Build correct payload
+  let payload = { obj_id, status: isFullObject };
+
+  if (!isFullObject && indexToDelete !== -1) {
+    const cropImage = new_img_arr[indexToDelete];
+    payload.objects_urls = [cropImage.image]; // ✅ correct key as per API
+  }
+
+  try {
+    const response = await deleteHistory(payload);
+
+    if (response.status === 200) {
+      if (isFullObject) {
+        dispatch(fetchSuccess('Object deleted successfully!'));
+      } else {
+        new_img_arr.splice(indexToDelete, 1);
+        setSelectedImageURL(new_img_arr);
+        dispatch(fetchSuccess('Crop image deleted successfully!'));
+      }
+    } else {
+      dispatch(fetchError(`Failed to delete ${isFullObject ? 'the object' : 'the crop image'}`));
+    }
+  } catch (error) {
+    dispatch(fetchError(`Error deleting ${isFullObject ? 'the object' : 'the crop image'}`));
+    console.error(`Error deleting ${isFullObject ? 'the object' : 'the crop image'}:`, error);
+  }
+};
   const handlePlayMidi = id => {
     if (currentMidi === id) {
       setCurrentMidi(0);
@@ -617,12 +823,32 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
   };
 
   const handleScanButtonClick = async () => {
+    // Check free trial first on every scan
+    try {
+      const response = await freeTrialCheck();
+      if (response.status !== 200 || response.trial !== true) {
+        setHasFreeTrial(false);
+        setShowSubscriptionDialog(true);
+        return;
+      }
+      setHasFreeTrial(true);
+    } catch (error) {
+      console.error('Error checking free trial:', error);
+      setHasFreeTrial(false);
+      setShowSubscriptionDialog(true);
+      return;
+    }
+
     setOpenScan(true);
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     videoRef.current.srcObject = stream;
     videoRef.current.play();
   };
 
+  const handleSubscriptionRedirect = () => {
+    setShowSubscriptionDialog(false);
+    History.push('/subscription'); 
+  };
   const handleZoomInClick = () => {
     const new_scale = scale * 1.1;
     if (new_scale > 2) return;
@@ -769,7 +995,7 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
                   }}
                   disabled={loading}
                   startIcon={<CloudUpload />}>
-                  {<IntlMessages id="dashboard.upload" />}
+                 <IntlMessages id="dashboard.upload" />
                 </Button>
                 <Button
                   variant="contained"
@@ -777,7 +1003,7 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
                   onClick={() => handleScanButtonClick()}
                   disabled={loading}
                   startIcon={<PhotoCamera />}>
-                  {<IntlMessages id="dashboard.scan" />}
+                 <IntlMessages id="dashboard.scan" />
                 </Button>
                 <IconButton color="secondary" onClick={() => handleZoomInClick()}>
                   <ZoomIn />
@@ -954,6 +1180,21 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
           </Button>
           <Button variant="contained" color="primary" onClick={handleCaptureButtonClick}>
             Capture
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={showSubscriptionDialog} onClose={() => setShowSubscriptionDialog(false)} maxWidth="sm" fullWidth>
+        <DialogContent>
+          <Typography variant="body1" gutterBottom>
+           <IntlMessages id="dashboard.freeTrial" />
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowSubscriptionDialog(false)} color="primary">
+            <IntlMessages id="dashboard.cancel" />
+          </Button>
+          <Button onClick={handleSubscriptionRedirect} color="primary" variant="contained">
+            <IntlMessages id="dashboard.buysubscription" />
           </Button>
         </DialogActions>
       </Dialog>

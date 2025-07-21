@@ -1,5 +1,5 @@
 import React from 'react';
-import { PostAdd } from '@material-ui/icons';
+import { PostAdd, History } from '@material-ui/icons'; 
 import IntlMessages from '../../../utils/IntlMessages';
 
 export const sidebarNavs = [
@@ -12,6 +12,12 @@ export const sidebarNavs = [
         type: 'item',
         icon: <PostAdd />,
         link: '/dashboard',
+      },
+      {
+        name: <IntlMessages id={'sidebar.history'} />,
+        type: 'item',
+        icon: <History />,
+        link: '/history',
       },
     ],
   },
@@ -28,6 +34,12 @@ export const horizontalDefaultNavs = [
         icon: <PostAdd />,
         link: '/dashboard',
       },
+      {
+        name: <IntlMessages id={'sidebar.history'} />,
+        type: 'item',
+        icon: <History />,
+        link: '/history',
+      },
     ],
   },
 ];
@@ -42,6 +54,12 @@ export const minimalHorizontalMenus = [
         type: 'item',
         icon: <PostAdd />,
         link: '/dashboard',
+      },
+      {
+        name: <IntlMessages id={'sidebar.history'} />,
+        type: 'item',
+        icon: <History />,
+        link: '/history',
       },
     ],
   },

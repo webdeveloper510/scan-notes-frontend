@@ -713,5 +713,10 @@
 "detailPage.image": "passages sélections ",
 "detailPage.solution": "Solution",
 "dashboard.imageTitle": "Sélection de passages",
-"detailPage.creationDate": " Crée-le"
+"detailPage.creationDate": " Crée-le",
+"dashboard.freeTrial": "Vous devez avoir un abonnement actif pour télécharger des images. Veuillez acheter un forfait pour continuer à utiliser cette fonctionnalité.",
+"dashboard.buysubscription": "Acheter un abonnement",
+"dashboard.cancel": "Annuler",
+"sidebar.history": "Historique"
+
 }

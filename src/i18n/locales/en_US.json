@@ -720,5 +720,9 @@
   "detailPage.image": "passages selections",
   "detailPage.solution": "Solution",
   "dashboard.imageTitle":"Selection of passages",
-  "detailPage.creationDate": "Creation Date"
+  "detailPage.creationDate": "Creation Date",
+  "dashboard.freeTrial":" You need an active subscription to upload images. Please buy a plan to continue using this feature.",
+  "dashboard.buysubscription":"Buy Subscription",
+  "dashboard.cancel": "Cancel",
+  "sidebar.history": "History"
 }

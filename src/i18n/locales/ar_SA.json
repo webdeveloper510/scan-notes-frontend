@@ -704,16 +704,19 @@
   "dashboard.scan": "مسح",
   "dashboard.sheet": "ورقة",
   "dashboard.submit": "التحقق من صحة الاختيارات",
- "dashboard.goto": "إنشاء ورقة العمل",
+  "dashboard.goto": "إنشاء ورقة العمل",
   "detailPage.title": "النتائج",
   "detailPage.worksheet": "ورقة العمل",
   "detailPage.worksheett": "ورقة العمل",
-
   "detailpage.Title": "العنوان",
-"detailPage.composer": "الملحن",
-"detailPage.date": "تاريخ الإنشاء",
-"detailPage.image": "اختيارات الممرات",
-"detailPage.solution": "الحل",
-"dashboard.imageTitle": "اختيار المقاطع"
+  "detailPage.composer": "الملحن",
+  "detailPage.date": "تاريخ الإنشاء",
+  "detailPage.image": "اختيارات الممرات",
+  "detailPage.solution": "الحل",
+  "dashboard.imageTitle": "اختيار المقاطع",
+  "dashboard.freeTrial": "تحتاج إلى اشتراك نشط لتحميل الصور. يرجى شراء خطة لمواصلة استخدام هذه الميزة.",
+  "dashboard.buysubscription": "شراء اشتراك",
+  "dashboard.cancel": "إلغاء",
+  "sidebar.history": "السجل"
 
 }
