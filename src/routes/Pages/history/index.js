@@ -213,7 +213,7 @@ const handleEdit = (item) => {
     <PageContainer heading={<IntlMessages id="sidebar.history" />} breadcrumbs={breadcrumbs}>
       <GridContainer>
         <Grid item xs={12}>
-      
+  
           {/* Stats Card */}
           {/* <Card className={classes.statsCard}>
             <CardContent>
@@ -226,7 +226,6 @@ const handleEdit = (item) => {
               </Box>
             </CardContent>
           </Card> */}
-
           {data.length === 0 ? (
             <div className={classes.noDataContainer}>
               <ImageIcon className={classes.noDataIcon} />
