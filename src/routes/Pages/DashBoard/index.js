@@ -1009,7 +1009,6 @@ const handleDeleteImage = async (id, isFullObject = false) => {
             {/* Control buttons */}
          <Grid item xs={12}>
   <div className={classes.controlsSection}>
-    {/* Only show upload and scan buttons when NOT coming from history */}
     {!isComingFromHistory() && (
       <>
         <Button
