@@ -338,11 +338,13 @@ const handleSubmitClick = () => {
   const eventData = new FormData();
   eventData.append('photo_img', photo_img);
   
-  // Get history ID from URL parameters if coming from history
   const urlParams = new URLSearchParams(location.search);
   const historyId = urlParams.get('id');
+  
   if (historyId) {
     eventData.append('object_id', historyId);
+  } else {
+    eventData.append('object_id', '0');
   }
   
   selectedImageURL.forEach((file, index) => {
@@ -372,6 +374,10 @@ const handleSubmitClick = () => {
       setLoading(false);
       dispatch(fetchError(error.message));
     });
+};
+const isComingFromHistory = () => {
+  const urlParams = new URLSearchParams(location.search);
+  return urlParams.get('id') !== null;
 };
   const handleDragStart = (e, item) => {
     setDraggedItem(item);
@@ -783,35 +789,51 @@ const extractSelectedArea = (startXPos, startYPos, width, height) => {
 const handleDeleteImage = async (id, isFullObject = false) => {
   const new_img_arr = [...selectedImageURL];
   const indexToDelete = new_img_arr.findIndex(item => item.id === id);
-   const urlParams = new URLSearchParams(location.search);
-  const historyId = urlParams.get('id');
-  const obj_id =historyId;
-
-  // Build correct payload
-  let payload = { obj_id, status: isFullObject };
-
-  if (!isFullObject && indexToDelete !== -1) {
-    const cropImage = new_img_arr[indexToDelete];
-    payload.objects_urls = [cropImage.image]; // ✅ correct key as per API
+  
+  if (indexToDelete === -1) {
+    dispatch(fetchError('Image not found'));
+    return;
   }
 
-  try {
-    const response = await deleteHistory(payload);
+  const cropImage = new_img_arr[indexToDelete];
+  
+  // Only call API if the image is from history
+  if (cropImage.isFromHistory) {
+    const urlParams = new URLSearchParams(location.search);
+    const historyId = urlParams.get('id');
+    const obj_id = historyId;
 
-    if (response.status === 200) {
-      if (isFullObject) {
-        dispatch(fetchSuccess('Object deleted successfully!'));
-      } else {
-        new_img_arr.splice(indexToDelete, 1);
-        setSelectedImageURL(new_img_arr);
-        dispatch(fetchSuccess('Crop image deleted successfully!'));
-      }
-    } else {
-      dispatch(fetchError(`Failed to delete ${isFullObject ? 'the object' : 'the crop image'}`));
+    // Build correct payload
+    let payload = { obj_id, status: isFullObject };
+
+    if (!isFullObject) {
+      payload.objects_urls = [cropImage.image]; // ✅ correct key as per API
     }
-  } catch (error) {
-    dispatch(fetchError(`Error deleting ${isFullObject ? 'the object' : 'the crop image'}`));
-    console.error(`Error deleting ${isFullObject ? 'the object' : 'the crop image'}:`, error);
+
+    try {
+      const response = await deleteHistory(payload);
+
+      if (response.status === 200) {
+        if (isFullObject) {
+          dispatch(fetchSuccess('Object deleted successfully!'));
+        } else {
+          // Remove from local state after successful API call
+          new_img_arr.splice(indexToDelete, 1);
+          setSelectedImageURL(new_img_arr);
+          dispatch(fetchSuccess('Crop image deleted successfully!'));
+        }
+      } else {
+        dispatch(fetchError(`Failed to delete ${isFullObject ? 'the object' : 'the crop image'}`));
+      }
+    } catch (error) {
+      dispatch(fetchError(`Error deleting ${isFullObject ? 'the object' : 'the crop image'}`));
+      console.error(`Error deleting ${isFullObject ? 'the object' : 'the crop image'}:`, error);
+    }
+  } else {
+    // For non-history images (newly cropped), just remove from local state
+    new_img_arr.splice(indexToDelete, 1);
+    setSelectedImageURL(new_img_arr);
+    dispatch(fetchSuccess('Image removed successfully!'));
   }
 };
   const handlePlayMidi = id => {
@@ -985,40 +1007,46 @@ const handleDeleteImage = async (id, isFullObject = false) => {
         <Grid item xs={12}>
           <GridContainer>
             {/* Control buttons */}
-            <Grid item xs={12}>
-              <div className={classes.controlsSection}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={e => {
-                    document.getElementById('photo_img').click();
-                  }}
-                  disabled={loading}
-                  startIcon={<CloudUpload />}>
-                 <IntlMessages id="dashboard.upload" />
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleScanButtonClick()}
-                  disabled={loading}
-                  startIcon={<PhotoCamera />}>
-                 <IntlMessages id="dashboard.scan" />
-                </Button>
-                <IconButton color="secondary" onClick={() => handleZoomInClick()}>
-                  <ZoomIn />
-                </IconButton>
-                <IconButton color="secondary" onClick={() => handleZoomOutClick()}>
-                  <ZoomOut />
-                </IconButton>
-                <IconButton color="secondary" onClick={() => handleZoomOutMapClick()}>
-                  <ZoomOutMap />
-                </IconButton>
-                <IconButton color={zoomFocus ? 'secondary' : 'primary'} onClick={() => handleZoomFocusClick()}>
-                  <CenterFocusStrong />
-                </IconButton>
-              </div>
-            </Grid>
+         <Grid item xs={12}>
+  <div className={classes.controlsSection}>
+    {/* Only show upload and scan buttons when NOT coming from history */}
+    {!isComingFromHistory() && (
+      <>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={e => {
+            document.getElementById('photo_img').click();
+          }}
+          disabled={loading}
+          startIcon={<CloudUpload />}>
+         <IntlMessages id="dashboard.upload" />
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleScanButtonClick()}
+          disabled={loading}
+          startIcon={<PhotoCamera />}>
+         <IntlMessages id="dashboard.scan" />
+        </Button>
+      </>
+    )}
+    {/* Always show zoom controls */}
+    <IconButton color="secondary" onClick={() => handleZoomInClick()}>
+      <ZoomIn />
+    </IconButton>
+    <IconButton color="secondary" onClick={() => handleZoomOutClick()}>
+      <ZoomOut />
+    </IconButton>
+    <IconButton color="secondary" onClick={() => handleZoomOutMapClick()}>
+      <ZoomOutMap />
+    </IconButton>
+    <IconButton color={zoomFocus ? 'secondary' : 'primary'} onClick={() => handleZoomFocusClick()}>
+      <CenterFocusStrong />
+    </IconButton>
+  </div>
+</Grid>
             {/* Main content with side-by-side layout */}
             <Grid item xs={12}>
               <div className={classes.mainLayout}>
