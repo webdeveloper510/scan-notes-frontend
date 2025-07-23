@@ -289,14 +289,14 @@ const handleDownloadClick = () => {
 
   const cleanHeader = document.createElement('div');
   cleanHeader.innerHTML = `
-    <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 15px;"> 
-      ${worksheetLabel}
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 8px; border-bottom: 1px solid #ddd;"> 
-      <span><strong>${creationDateLabel}:</strong> ${creationDate}</span>
-      <span>${title || 'Untitled'}</span>
-      <span> ${composer || 'Unknown'}</span>
-    </div>
+   <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 15px;"> 
+    ${worksheetLabel}
+  </div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 8px; border-bottom: 1px solid #ddd;">
+  <span style="flex: 1; text-align: center;"><strong>${creationDateLabel}:</strong> ${creationDate}</span>
+  <span style="flex: 1; text-align: center; font-weight: bold;">${title || 'Untitled'}</span>
+  <span style="flex: 1; text-align: center;">${composer || 'Unknown'}</span>
+</div>
   `;
   container.appendChild(cleanHeader);
 
