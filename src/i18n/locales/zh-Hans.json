@@ -716,6 +716,13 @@
   "dashboard.freeTrial": "您需要一个有效的订阅才能上传图片。请购买套餐以继续使用此功能。",
   "dashboard.buysubscription": "购买订阅",
   "dashboard.cancel": "取消",
-  "sidebar.history": "历史记录"
-
+  "sidebar.history": "历史记录",
+  "appModule.firstName": "名字",
+  "appModule.lastName": "姓氏",
+  "appModule.phoneNumber": "电话号码",
+  "appModule.address": "地址",
+  "appModule.birthday": "出生日期",
+  "appModule.school": "学校 / 音乐学院名称",
+  "appModule.teacher": "是教师吗？（是/否）",
+  "appModule.software": "您是如何得知该软件的？"
 }

@@ -716,5 +716,14 @@
   "dashboard.freeTrial": "È necessario un abbonamento attivo per caricare immagini. Acquista un piano per continuare a utilizzare questa funzionalità.",
   "dashboard.buysubscription": "Acquista abbonamento",
   "dashboard.cancel": "Annulla",
-  "sidebar.history": "Cronologia"
+  "sidebar.history": "Cronologia",
+  "appModule.firstName": "Nome",
+"appModule.lastName": "Cognome",
+"appModule.phoneNumber": "Numero di telefono",
+"appModule.address": "Indirizzo",
+"appModule.birthday": "Data di nascita",
+"appModule.school": "Nome della scuola / conservatorio",
+"appModule.teacher": "Insegnante? (SÌ/NO)",
+"appModule.software": "Come hai scoperto il software?"
+
 }

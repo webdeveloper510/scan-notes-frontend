@@ -716,6 +716,14 @@
 "dashboard.freeTrial": "Necesitas una suscripción activa para subir imágenes. Por favor, compra un plan para seguir utilizando esta función.",
 "dashboard.buysubscription": "Comprar suscripción",
 "dashboard.cancel": "Cancelar",
-"sidebar.history": "Historial"
+"sidebar.history": "Historial",
+"appModule.firstName": "Nombre",
+"appModule.lastName": "Apellido",
+"appModule.phoneNumber": "Número de teléfono",
+"appModule.address": "Dirección",
+"appModule.birthday": "Fecha de nacimiento",
+"appModule.school": "Nombre de la escuela / conservatorio",
+"appModule.teacher": "¿Profesor? (SÍ/NO)",
+"appModule.software": "¿Cómo supiste del software?"
 
 }

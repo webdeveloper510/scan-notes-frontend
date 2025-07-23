@@ -710,13 +710,21 @@
   "detailpage.Title": "Titre",
 "detailPage.composer": "Compositeur",
 "detailPage.date": "Date de création",
-"detailPage.image": "passages sélections ",
-"detailPage.solution": "Solution",
-"dashboard.imageTitle": "Sélection de passages",
-"detailPage.creationDate": " Crée-le",
+"detailPage.image": "passages sélectionnés",
+"detailPage.solution": "Solutions",
+"dashboard.imageTitle": "passages sélectionnés",
+"detailPage.creationDate": " Créé le",
 "dashboard.freeTrial": "Vous devez avoir un abonnement actif pour télécharger des images. Veuillez acheter un forfait pour continuer à utiliser cette fonctionnalité.",
 "dashboard.buysubscription": "Acheter un abonnement",
 "dashboard.cancel": "Annuler",
-"sidebar.history": "Historique"
+"sidebar.history": "Historique",
+"appModule.firstName": "Prénom",
+"appModule.lastName": "Nom de famille",
+"appModule.phoneNumber": "Numéro de téléphone",
+"appModule.address": "Adresse",
+"appModule.birthday": "Date de naissance",
+"appModule.school": "Nom de l'école / conservatoire",
+"appModule.teacher": "Enseignant ? (OUI/NON)",
+"appModule.software": "Comment avez-vous découvert le logiciel ?"
 
 }

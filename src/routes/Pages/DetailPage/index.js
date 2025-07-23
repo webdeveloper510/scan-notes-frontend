@@ -285,17 +285,17 @@ const handleDownloadClick = () => {
   container.style.top = '-9999px';
   container.style.width = '800px';
   container.style.backgroundColor = 'white';
-  container.style.padding = '20px';
+  container.style.padding = '10px'; 
 
   const cleanHeader = document.createElement('div');
   cleanHeader.innerHTML = `
-    <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 20px;">
+    <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 15px;"> 
       ${worksheetLabel}
     </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #ddd;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 8px; border-bottom: 1px solid #ddd;"> 
       <span><strong>${creationDateLabel}:</strong> ${creationDate}</span>
-      <span><strong>${titleLabel}:</strong> ${title || 'Untitled'}</span>
-      <span><strong>${composerLabel}:</strong> ${composer || 'Unknown'}</span>
+      <span>${title || 'Untitled'}</span>
+      <span> ${composer || 'Unknown'}</span>
     </div>
   `;
   container.appendChild(cleanHeader);
@@ -304,7 +304,7 @@ const handleDownloadClick = () => {
   const tableClone = document.createElement('table');
   tableClone.style.width = '100%';
   tableClone.style.borderCollapse = 'collapse';
-  tableClone.style.marginTop = '20px';
+  tableClone.style.marginTop = '10px'; // Reduced from 20px
 
   // Add table headers
   const thead = document.createElement('thead');
@@ -384,13 +384,13 @@ const handleDownloadClick = () => {
       img.addEventListener('load', function () {
         const imageHeight = img.naturalHeight;
         const imageWidth = img.naturalWidth;
-        const titleHeight = 10;
+        const titleHeight = 2; // Reduced from 10 to 2 for minimal top spacing
 
         const pdf = new jsPDF();
-        const width = pdf.internal.pageSize.getWidth() * 0.9;
+        const width = pdf.internal.pageSize.getWidth() * 0.95; // Increased from 0.9 to 0.95
         const height = (width * imageHeight) / imageWidth;
 
-        pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.05, titleHeight, width, height);
+        pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.025, titleHeight, width, height); // Adjusted left margin from 0.05 to 0.025
         document.body.removeChild(container);
 
         for (let i = 0; i < results.length; i++) {
@@ -418,7 +418,6 @@ const handleDownloadClick = () => {
       }
     });
 };
-
   const handleEditImageClick = index => {
     setShowImage(index);
   };
@@ -632,18 +631,51 @@ const handleDownloadClick = () => {
                             </IconButton>
                           </div>
                         </TableCell>
-                        <TableCell className={classes.solutionColumn}>
-                          <TextField
-                            fullWidth
-                            multiline
-                            variant="outlined"
-                            placeholder="Write your solution here..."
-                            value={solutions[result.id] || ''}
-                            onChange={(e) => handleSolutionChange(result.id, e.target.value)}
-                            rows={4}
-                            style={{ minHeight: '100px' }}
-                          />
-                        </TableCell>
+                    <TableCell 
+  className={`${classes.solutionColumn} solution-column`}
+  onMouseDown={(e) => {
+    // Prevent drag when clicking on the solution column
+    e.stopPropagation();
+  }}
+>
+  <TextField
+    fullWidth
+    multiline
+    variant="outlined"
+    placeholder="write your solution..."
+    value={solutions[result.id] || ''}
+    onChange={(e) => handleSolutionChange(result.id, e.target.value)}
+    rows={6}
+    style={{ 
+      minHeight: '120px',
+      backgroundColor: '#ffffff',
+      cursor: 'text',
+    }}
+    InputProps={{
+      style: {
+        fontSize: '14px',
+        lineHeight: '1.5',
+        padding: '12px',
+        cursor: 'text',
+      },
+    }}
+    inputProps={{
+      style: {
+        resize: 'vertical',
+        minHeight: '100px',
+        cursor: 'text',
+      },
+      onMouseDown: (e) => {
+        // Prevent drag event from interfering
+        e.stopPropagation();
+      },
+      onClick: (e) => {
+        e.target.focus();
+        e.stopPropagation();
+      },
+    }}
+  />
+</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

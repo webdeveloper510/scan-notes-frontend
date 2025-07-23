@@ -717,6 +717,13 @@
   "dashboard.freeTrial": "تحتاج إلى اشتراك نشط لتحميل الصور. يرجى شراء خطة لمواصلة استخدام هذه الميزة.",
   "dashboard.buysubscription": "شراء اشتراك",
   "dashboard.cancel": "إلغاء",
-  "sidebar.history": "السجل"
-
+  "sidebar.history": "السجل",
+  "appModule.firstName": "الاسم الأول",
+  "appModule.lastName": "اسم العائلة",
+  "appModule.phoneNumber": "رقم الهاتف",
+  "appModule.address": "العنوان",
+  "appModule.birthday": "تاريخ الميلاد",
+  "appModule.school": "اسم المدرسة / المعهد",
+  "appModule.teacher": "هل أنت معلم؟ (نعم/لا)",
+  "appModule.software": "كيف عرفت عن البرنامج؟"
 }
