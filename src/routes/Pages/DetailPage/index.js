@@ -42,7 +42,7 @@ import clsx from 'clsx';
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
+import { titleComposerData } from 'services/auth/Basic/api';
 const breadcrumbs = [
   { label: <IntlMessages id={'sidebar.main'} />, link: '/' },
   { label: <IntlMessages id={'detailPage.worksheet'} />, isActive: true },
@@ -68,8 +68,8 @@ const useStyles = makeStyles(theme => ({
   },
   imageContainer: {
     position: 'relative',
-    margin: 0, // Remove vertical margin
-    padding: 0, // Remove padding
+    margin: 0,
+    padding: 0,
   },
   editImage: {
     position: 'absolute',
@@ -95,7 +95,6 @@ const useStyles = makeStyles(theme => ({
     display: 'block',
     margin: '10px auto',
   },
-  // Drag and drop styles
   draggableRow: {
     cursor: 'move',
     transition: 'all 0.2s ease',
@@ -117,7 +116,6 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: '#f9f9f9',
     },
   },
-  // New styles for column widths
   imageColumn: {
     minWidth: '300px', 
     maxWidth: '70%', 
@@ -132,6 +130,7 @@ const useStyles = makeStyles(theme => ({
 const DetailPage = props => {
   const classes = useStyles();
   const History = useHistory();
+  const dispatch = useDispatch();
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState('');
   const [results, setResults] = useState(props.location.state.selectedImageURL);
@@ -142,11 +141,16 @@ const DetailPage = props => {
   const [composer, setComposer] = useState('');
   const [creationDate] = useState(new Date().toLocaleDateString());
   const [solutions, setSolutions] = useState({});
+  
+  // Get object_id from props.location.state (passed from dashboard)
+  const [objectId, setObjectId] = useState(() => {
+    return props.location.state?.object_id || '0';
+  });
+  console.log("🚀 ~ DetailPage ~ objectId:", objectId)
+
   const intl = useIntl();
   const worksheetLabel = intl.formatMessage({ id: 'detailPage.worksheet' });
   const solutionLabel = intl.formatMessage({ id: 'detailPage.solution' });
-  
-  // Add translated labels for PDF
   const creationDateLabel = intl.formatMessage({ id: 'detailPage.creationDate' });
   const titleLabel = intl.formatMessage({ id: 'detailPage.title' });
   const composerLabel = intl.formatMessage({ id: 'detailPage.composer' });
@@ -162,6 +166,75 @@ const DetailPage = props => {
   // Drag and drop state
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
+
+  // API call function for title/composer update
+  const updateTitleComposer = async (newTitle, newComposer) => {
+    try {
+      dispatch(fetchStart());
+      
+      const payload = {
+        object_id: objectId,
+        title: newTitle,
+        composer: newComposer
+      };
+
+      const response = await titleComposerData(payload);
+      
+      if (response.status === 200 || response.success) {
+        dispatch(fetchSuccess('Title and Composer updated successfully!'));
+        setMessage('Title and Composer updated successfully!');
+        setShowMessage(true);
+      } else {
+        dispatch(fetchError(response.message || 'Failed to update title and composer'));
+        setMessage(response.message || 'Failed to update title and composer');
+        setShowMessage(true);
+      }
+    } catch (error) {
+      dispatch(fetchError(error.message || 'Something went wrong'));
+      setMessage(error.message || 'Something went wrong');
+      setShowMessage(true);
+    }
+  };
+const checkAndUpdateTitleComposer = (currentTitle, currentComposer) => {
+  const trimmedTitle = currentTitle.trim();
+  const trimmedComposer = currentComposer.trim();
+  
+  // Only call API if both title and composer are filled
+  if (trimmedTitle && trimmedComposer) {
+    updateTitleComposer(trimmedTitle, trimmedComposer);
+  }
+};
+  // Handle title change with debounce
+const handleTitleChange = (e) => {
+  const newTitle = e.target.value;
+  setTitle(newTitle);
+};
+
+  // Handle composer change with debounce
+const handleComposerChange = (e) => {
+  const newComposer = e.target.value;
+  setComposer(newComposer);
+};
+
+  // Handle blur events to call API when user finishes editing
+const handleTitleBlur = () => {
+  checkAndUpdateTitleComposer(title, composer);
+};
+
+const handleComposerBlur = () => {
+  checkAndUpdateTitleComposer(title, composer);
+};
+const handleSaveTitleComposer = () => {
+  const trimmedTitle = title.trim();
+  const trimmedComposer = composer.trim();
+  
+  if (trimmedTitle && trimmedComposer) {
+    updateTitleComposer(trimmedTitle, trimmedComposer);
+  } else {
+    setMessage('Please enter both title and composer');
+    setShowMessage(true);
+  }
+};
 
   useEffect(() => {
     if (showImage >= 0) {
@@ -202,7 +275,6 @@ const DetailPage = props => {
   };
 
   const handleDragLeave = e => {
-    // Only clear dragOverItem if we're actually leaving the item
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setDragOverItem(null);
     }
@@ -221,10 +293,7 @@ const DetailPage = props => {
     const draggedIndex = newResultsArray.findIndex(item => item.id === draggedItem.id);
     const targetIndex = newResultsArray.findIndex(item => item.id === targetItem.id);
 
-    // Remove the dragged item
     const [draggedItemData] = newResultsArray.splice(draggedIndex, 1);
-
-    // Insert it at the target position
     newResultsArray.splice(targetIndex, 0, draggedItemData);
 
     setResults(newResultsArray);
@@ -267,131 +336,143 @@ const DetailPage = props => {
     }));
   };
 
-const handleDownloadClick = () => {
-  const table = document.getElementById('scan-table');
-  const headerInfo = document.getElementById('header-info');
-  const rows = table.getElementsByTagName('tr');
+  const handleDownloadClick = () => {
+    const table = document.getElementById('scan-table');
+    const headerInfo = document.getElementById('header-info');
+    const rows = table.getElementsByTagName('tr');
 
-  for (let i = 0; i < results.length; i++) {
-    const pencil = document.getElementById(`pencil-${i}`);
-    if (pencil) {
-      pencil.style.display = 'none';
+    for (let i = 0; i < results.length; i++) {
+      const pencil = document.getElementById(`pencil-${i}`);
+      if (pencil) {
+        pencil.style.display = 'none';
+      }
     }
-  }
 
-  const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
-  container.style.width = '800px';
-  container.style.backgroundColor = 'white';
-  container.style.padding = '10px'; 
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.style.width = '800px';
+    container.style.backgroundColor = 'white';
+    container.style.padding = '10px'; 
 
-  const cleanHeader = document.createElement('div');
-  cleanHeader.innerHTML = `
-   <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 15px;"> 
-    ${worksheetLabel}
+    const cleanHeader = document.createElement('div');
+    cleanHeader.innerHTML = `
+     <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 15px;"> 
+      ${worksheetLabel}
+    </div>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 8px; border-bottom: 1px solid #ddd;">
+    <span style="flex: 1; text-align: center;"><strong>${creationDateLabel}:</strong> ${creationDate}</span>
+    <span style="flex: 1; text-align: center; font-weight: bold;">${title || 'Untitled'}</span>
+    <span style="flex: 1; text-align: center;">${composer || 'Unknown'}</span>
   </div>
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 8px; border-bottom: 1px solid #ddd;">
-  <span style="flex: 1; text-align: center;"><strong>${creationDateLabel}:</strong> ${creationDate}</span>
-  <span style="flex: 1; text-align: center; font-weight: bold;">${title || 'Untitled'}</span>
-  <span style="flex: 1; text-align: center;">${composer || 'Unknown'}</span>
-</div>
-  `;
-  container.appendChild(cleanHeader);
+    `;
+    container.appendChild(cleanHeader);
 
-  // Create table with proper headers for PDF
-  const tableClone = document.createElement('table');
-  tableClone.style.width = '100%';
-  tableClone.style.borderCollapse = 'collapse';
-  tableClone.style.marginTop = '10px'; // Reduced from 20px
+    const tableClone = document.createElement('table');
+    tableClone.style.width = '100%';
+    tableClone.style.borderCollapse = 'collapse';
+    tableClone.style.marginTop = '10px';
 
-  // Add table headers
-  const thead = document.createElement('thead');
-  const headerRow = document.createElement('tr');
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
 
-  const imageHeader = document.createElement('th');
-  imageHeader.style.border = '1px solid #ddd';
-  imageHeader.style.padding = '8px';
-  imageHeader.style.textAlign = 'center';
-  imageHeader.style.backgroundColor = '#f5f5f5';
-  imageHeader.style.width = '66.66%';
-  imageHeader.textContent = intl.formatMessage({ id: 'detailPage.image' });
+    const imageHeader = document.createElement('th');
+    imageHeader.style.border = '1px solid #ddd';
+    imageHeader.style.padding = '8px';
+    imageHeader.style.textAlign = 'center';
+    imageHeader.style.backgroundColor = '#f5f5f5';
+    imageHeader.style.width = '66.66%';
+    imageHeader.textContent = intl.formatMessage({ id: 'detailPage.image' });
 
-  const solutionHeader = document.createElement('th');
-  solutionHeader.style.border = '1px solid #ddd';
-  solutionHeader.style.padding = '8px';
-  solutionHeader.style.textAlign = 'center';
-  solutionHeader.style.backgroundColor = '#f5f5f5';
-  solutionHeader.style.width = '33.33%';
-  solutionHeader.textContent = solutionLabel;
+    const solutionHeader = document.createElement('th');
+    solutionHeader.style.border = '1px solid #ddd';
+    solutionHeader.style.padding = '8px';
+    solutionHeader.style.textAlign = 'center';
+    solutionHeader.style.backgroundColor = '#f5f5f5';
+    solutionHeader.style.width = '33.33%';
+    solutionHeader.textContent = solutionLabel;
 
-  headerRow.appendChild(imageHeader);
-  headerRow.appendChild(solutionHeader);
-  thead.appendChild(headerRow);
-  tableClone.appendChild(thead);
+    headerRow.appendChild(imageHeader);
+    headerRow.appendChild(solutionHeader);
+    thead.appendChild(headerRow);
+    tableClone.appendChild(thead);
 
-  // Add table body
-  const tbody = document.createElement('tbody');
+    const tbody = document.createElement('tbody');
 
-  results.forEach((result, index) => {
-    const row = document.createElement('tr');
+    results.forEach((result, index) => {
+      const row = document.createElement('tr');
 
-    // Image cell
-    const imageCell = document.createElement('td');
-    imageCell.style.border = '1px solid #ddd';
-    imageCell.style.padding = '8px';
-    imageCell.style.verticalAlign = 'top';
-    imageCell.style.width = '66.66%';
+      const imageCell = document.createElement('td');
+      imageCell.style.border = '1px solid #ddd';
+      imageCell.style.padding = '8px';
+      imageCell.style.verticalAlign = 'top';
+      imageCell.style.width = '66.66%';
 
-    const img = document.createElement('img');
-    img.src = result.image;
-    img.style.maxWidth = '100%';
-    img.style.height = 'auto';
-    imageCell.appendChild(img);
+      const img = document.createElement('img');
+      img.src = result.image;
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      imageCell.appendChild(img);
 
-    // Solution cell
-    const solutionCell = document.createElement('td');
-    solutionCell.style.border = '1px solid #ddd';
-    solutionCell.style.padding = '8px';
-    solutionCell.style.verticalAlign = 'middle';
-    solutionCell.style.whiteSpace = 'pre-wrap';
-    solutionCell.style.wordBreak = 'break-word';
-    solutionCell.style.textAlign = 'center';
-    solutionCell.style.width = '33.33%';
-    solutionCell.textContent = solutions[result.id] || '';
+      const solutionCell = document.createElement('td');
+      solutionCell.style.border = '1px solid #ddd';
+      solutionCell.style.padding = '8px';
+      solutionCell.style.verticalAlign = 'middle';
+      solutionCell.style.whiteSpace = 'pre-wrap';
+      solutionCell.style.wordBreak = 'break-word';
+      solutionCell.style.textAlign = 'center';
+      solutionCell.style.width = '33.33%';
+      solutionCell.textContent = solutions[result.id] || '';
 
-    row.appendChild(imageCell);
-    row.appendChild(solutionCell);
-    tbody.appendChild(row);
-  });
+      row.appendChild(imageCell);
+      row.appendChild(solutionCell);
+      tbody.appendChild(row);
+    });
 
-  tableClone.appendChild(tbody);
-  container.appendChild(tableClone);
-  document.body.appendChild(container);
+    tableClone.appendChild(tbody);
+    container.appendChild(tableClone);
+    document.body.appendChild(container);
 
-  html2canvas(container, {
-    backgroundColor: 'white',
-    scale: 2,
-    logging: false,
-    useCORS: true,
-  })
-    .then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const img = new Image();
-      img.src = imgData;
+    html2canvas(container, {
+      backgroundColor: 'white',
+      scale: 2,
+      logging: false,
+      useCORS: true,
+    })
+      .then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const img = new Image();
+        img.src = imgData;
 
-      img.addEventListener('load', function () {
-        const imageHeight = img.naturalHeight;
-        const imageWidth = img.naturalWidth;
-        const titleHeight = 2; // Reduced from 10 to 2 for minimal top spacing
+        img.addEventListener('load', function () {
+          const imageHeight = img.naturalHeight;
+          const imageWidth = img.naturalWidth;
+          const titleHeight = 2;
 
-        const pdf = new jsPDF();
-        const width = pdf.internal.pageSize.getWidth() * 0.95; // Increased from 0.9 to 0.95
-        const height = (width * imageHeight) / imageWidth;
+          const pdf = new jsPDF();
+          const width = pdf.internal.pageSize.getWidth() * 0.95;
+          const height = (width * imageHeight) / imageWidth;
 
-        pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.025, titleHeight, width, height); // Adjusted left margin from 0.05 to 0.025
-        document.body.removeChild(container);
+          pdf.addImage(imgData, 'PNG', pdf.internal.pageSize.getWidth() * 0.025, titleHeight, width, height);
+          document.body.removeChild(container);
+
+          for (let i = 0; i < results.length; i++) {
+            const pencil = document.getElementById(`pencil-${i}`);
+            if (pencil) {
+              pencil.style.display = '';
+            }
+          }
+
+          const filename = `${composer || 'Unknown'} ${title || 'Untitled'} ${creationDate.replace(/\//g, '-')}.pdf`;
+          pdf.save(filename);
+        });
+      })
+      .catch(error => {
+        console.error('Error generating PDF:', error);
+        if (document.body.contains(container)) {
+          document.body.removeChild(container);
+        }
 
         for (let i = 0; i < results.length; i++) {
           const pencil = document.getElementById(`pencil-${i}`);
@@ -399,25 +480,9 @@ const handleDownloadClick = () => {
             pencil.style.display = '';
           }
         }
-
-        const filename = `${composer || 'Unknown'} ${title || 'Untitled'} ${creationDate.replace(/\//g, '-')}.pdf`;
-        pdf.save(filename);
       });
-    })
-    .catch(error => {
-      console.error('Error generating PDF:', error);
-      if (document.body.contains(container)) {
-        document.body.removeChild(container);
-      }
+  };
 
-      for (let i = 0; i < results.length; i++) {
-        const pencil = document.getElementById(`pencil-${i}`);
-        if (pencil) {
-          pencil.style.display = '';
-        }
-      }
-    });
-};
   const handleEditImageClick = index => {
     setShowImage(index);
   };
@@ -522,6 +587,13 @@ const handleDownloadClick = () => {
           <CmtCard className={classes.cardRoot}>
             <Box display="flex" justifyContent="flex-end" p={2} pt={4}>
               <Box mx={1}>
+                <Tooltip title="Save Title & Composer" aria-label="Save">
+                  <Button color="secondary" variant="contained" onClick={handleSaveTitleComposer}>
+                    Save
+                  </Button>
+                </Tooltip>
+              </Box>
+              <Box mx={1}>
                 <Tooltip title="Print" aria-label="Print">
                   <Button color="primary" variant="contained" onClick={handlePrintClick}>
                     <Print />
@@ -544,7 +616,6 @@ const handleDownloadClick = () => {
               </Box>
             </Box>
             <CmtCardContent className={classes.cardContentRoot}>
-              {/* Header Information Section */}
               <div id="header-info" className={classes.headerInfo}>
                 <Typography variant="h5" gutterBottom align='center'>
                   <IntlMessages id="detailPage.worksheett" />
@@ -555,7 +626,8 @@ const handleDownloadClick = () => {
                       fullWidth
                       label={<IntlMessages id="detailpage.Title" />}
                       value={title}
-                      onChange={e => setTitle(e.target.value)}
+                      onChange={handleTitleChange}
+                      onBlur={handleTitleBlur}
                       variant="outlined"
                       margin="normal"
                     />
@@ -565,7 +637,8 @@ const handleDownloadClick = () => {
                       fullWidth
                       label={<IntlMessages id="detailPage.composer" />}
                       value={composer}
-                      onChange={e => setComposer(e.target.value)}
+                      onChange={handleComposerChange}
+                      onBlur={handleComposerBlur}
                       variant="outlined"
                       margin="normal"
                     />
@@ -631,51 +704,49 @@ const handleDownloadClick = () => {
                             </IconButton>
                           </div>
                         </TableCell>
-                    <TableCell 
-  className={`${classes.solutionColumn} solution-column`}
-  onMouseDown={(e) => {
-    // Prevent drag when clicking on the solution column
-    e.stopPropagation();
-  }}
->
-  <TextField
-    fullWidth
-    multiline
-    variant="outlined"
-    placeholder="write your solution..."
-    value={solutions[result.id] || ''}
-    onChange={(e) => handleSolutionChange(result.id, e.target.value)}
-    rows={6}
-    style={{ 
-      minHeight: '120px',
-      backgroundColor: '#ffffff',
-      cursor: 'text',
-    }}
-    InputProps={{
-      style: {
-        fontSize: '14px',
-        lineHeight: '1.5',
-        padding: '12px',
-        cursor: 'text',
-      },
-    }}
-    inputProps={{
-      style: {
-        resize: 'vertical',
-        minHeight: '100px',
-        cursor: 'text',
-      },
-      onMouseDown: (e) => {
-        // Prevent drag event from interfering
-        e.stopPropagation();
-      },
-      onClick: (e) => {
-        e.target.focus();
-        e.stopPropagation();
-      },
-    }}
-  />
-</TableCell>
+                        <TableCell 
+                          className={`${classes.solutionColumn} solution-column`}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <TextField
+                            fullWidth
+                            multiline
+                            variant="outlined"
+                            placeholder="write your solution..."
+                            value={solutions[result.id] || ''}
+                            onChange={(e) => handleSolutionChange(result.id, e.target.value)}
+                            rows={6}
+                            style={{ 
+                              minHeight: '120px',
+                              backgroundColor: '#ffffff',
+                              cursor: 'text',
+                            }}
+                            InputProps={{
+                              style: {
+                                fontSize: '14px',
+                                lineHeight: '1.5',
+                                padding: '12px',
+                                cursor: 'text',
+                              },
+                            }}
+                            inputProps={{
+                              style: {
+                                resize: 'vertical',
+                                minHeight: '100px',
+                                cursor: 'text',
+                              },
+                              onMouseDown: (e) => {
+                                e.stopPropagation();
+                              },
+                              onClick: (e) => {
+                                e.target.focus();
+                                e.stopPropagation();
+                              },
+                            }}
+                          />
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

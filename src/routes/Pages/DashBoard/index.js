@@ -147,6 +147,7 @@ const DashBoard = props => {
   );
   const [showMessage, setShowMessage] = useState(false);
   const [message, setMessage] = useState('');
+  const [objectId, setObjectId] = useState(null);
   const dispatch = useDispatch();
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
@@ -245,6 +246,8 @@ const loadHistoryItem = async (historyId) => {
     const historyItem = await fetchHistoryItemById(historyId);
     if (historyItem) {
       setPhotoImgUrl(historyItem.orignal_image);
+      setObjectId(historyItem.id || historyId);
+      
       const convertedImages = historyItem.crop_images.map((cropImg, index) => ({
         id: index + 1,
         image: cropImg.file_url,
@@ -358,6 +361,9 @@ const handleSubmitClick = () => {
     .then(response => {
       if (response.data.status === 200) {
         dispatch(fetchSuccess('Success!'));
+            const responseObjectId = response.data.object_id || response.data.data?.object_id;
+            console.log("🚀 ~ handleSubmitClick ~ responseObjectId:", responseObjectId)
+        setObjectId(responseObjectId);
         let newSelectedImageURL = [...selectedImageURL];
         newSelectedImageURL.forEach((item, index) => {
           // item.source = response.data.data.sheet_wav_data[index];
@@ -426,12 +432,20 @@ const isComingFromHistory = () => {
     setDraggedItem(null);
     setDragOverItem(null);
   };
-  const handleGotoDetailClick = () => {
-    History.push({
-      pathname: 'detail-page',
-      state: { selectedImageURL, photo_img },
-    });
-  };
+const handleGotoDetailClick = () => {
+  const urlParams = new URLSearchParams(location.search);
+  const historyId = urlParams.get('id');
+  const currentObjectId = historyId || objectId;
+
+  History.push({
+    pathname: 'detail-page',
+    state: { 
+      selectedImageURL, 
+      photo_img, 
+      object_id: currentObjectId 
+    },
+  });
+};
 
   const handleMessageClose = () => () => {
     setShowMessage(false);

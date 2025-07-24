@@ -58,4 +58,12 @@ export const deleteHistory = async (payload) => {
   } catch (error) {
     return error?.response || { status: 500, data: { message: 'Something went wrong' } };
   }
-};
+}
+export const titleComposerData =async (payload) => {
+  try {
+    const response = await API.post('/title-composer-update/', payload);
+    return response.data;
+  } catch (error) {
+    return error?.response?.data || { message: 'Something went wrong' };
+  }
+}
