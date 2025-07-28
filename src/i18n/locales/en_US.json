@@ -709,8 +709,8 @@
   "dashboard.upload": "Upload Image/PDF",
   "dashboard.scan": "Scan",
   "dashboard.sheet": "Sheet",
-  "dashboard.submit": "validate the selections",
-  "dashboard.goto": "generate the worksheet",
+  "dashboard.submit": "Step 1 :validate the selections",
+  "dashboard.goto": "Step 2 :generate the worksheet",
   "detailPage.title": "Results",
   "detailPage.worksheet": "Worksheet",
   "detailPage.worksheett": "WORKSHEET",
@@ -726,5 +726,10 @@
   "dashboard.cancel": "Cancel",
   "sidebar.history": "History",
   "detailPage.actions":"Actions",
-  "navbar.managesubscription": "Manage Subscription"
+  "navbar.managesubscription": "Manage Subscription",
+  "history.thumbnail": "Thumbnail",
+  "history.column": "Column",
+  "history.view": "View",
+  "history.edit": "Edit",
+  "forgotEmail":"Don't remember your email?"
 }

@@ -410,7 +410,7 @@ const HistoryPage = () => {
                 className={classes.actionButton}
                 size={isMobile ? 'small' : 'medium'}
               >
-                View
+                <IntlMessages id={'history.view'} />
               </Button>
               <Button
                 variant="contained"
@@ -421,7 +421,7 @@ const HistoryPage = () => {
                 className={classes.actionButton}
                 size={isMobile ? 'small' : 'medium'}
               >
-                {editingItems.has(item.id) ? 'Processing...' : 'Edit'}
+                {editingItems.has(item.id) ? 'Processing...' : <IntlMessages id={'history.edit'} />}
               </Button>
             </CardActions>
           </Card>
@@ -436,7 +436,7 @@ const HistoryPage = () => {
         <TableHead>
           <TableRow>
             <TableCell className={classes.thumbnailCell}>
-              <Typography variant="subtitle2">Thumbnail</Typography>
+              <Typography variant="subtitle2"><IntlMessages id={'history.thumbnail'} /></Typography>
             </TableCell>
             <TableCell>
               <TableSortLabel
@@ -509,7 +509,7 @@ const HistoryPage = () => {
                     onClick={() => handleView(item)}
                     size="small"
                   >
-                    View
+                    <IntlMessages id={'history.view'} />
                   </Button>
                   <Button
                     variant="contained"
@@ -519,7 +519,7 @@ const HistoryPage = () => {
                     disabled={editingItems.has(item.id)}
                     size="small"
                   >
-                    {editingItems.has(item.id) ? 'Processing...' : 'Edit'}
+                    {editingItems.has(item.id) ? 'Processing...' : <IntlMessages id={'history.edit'} />}
                   </Button>
                 </Box>
               </TableCell>
@@ -561,14 +561,14 @@ const HistoryPage = () => {
                 onClick={() => handleDisplayModeChange('thumbnail')}
                 startIcon={<ViewModule />}
               >
-                Thumbnail
+                <IntlMessages id={'history.thumbnail'} />
               </Button>
               <Button
                 className={`${classes.viewButton} ${displayMode === 'column' ? classes.activeViewButton : ''}`}
                 onClick={() => handleDisplayModeChange('column')}
                 startIcon={<ViewList />}
               >
-                Column
+                <IntlMessages id={'history.column'} />
               </Button>
             </ButtonGroup>
           </Box>

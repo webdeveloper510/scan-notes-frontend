@@ -503,35 +503,41 @@ const loadImageFile = file => {
       loadPdfFile(photo_img, newPageNumber);
     }
   };
-  const handleFileInputChange = async fileObj => {
-    try {
-      const response = await freeTrialCheck();
-     if (response.status !== 200 || response.trial !== true || response.payment_status !== true) {
-        setHasFreeTrial(false);
-        setShowSubscriptionDialog(true);
-        const fileInput = document.getElementById('photo_img');
-        if (fileInput) {
-          fileInput.value = '';
-        }
-        return;
-      }
-      setHasFreeTrial(true);
-    } catch (error) {
-      console.error('Error checking free trial:', error);
+const handleFileInputChange = async (fileObj) => {
+  try {
+    const response = await freeTrialCheck();
+
+    const fileInput = document.getElementById('photo_img');
+    if (response?.payment_success === false) {
       setHasFreeTrial(false);
       setShowSubscriptionDialog(true);
-      const fileInput = document.getElementById('photo_img');
-      if (fileInput) {
-        fileInput.value = '';
-      }
+      if (fileInput) fileInput.value = '';
+      return;
+    }
+    if (response?.payment_status === "order.success") {
+      setHasFreeTrial(true);
+    } else {
+      setHasFreeTrial(false);
+      setShowSubscriptionDialog(true);
+      if (fileInput) fileInput.value = '';
       return;
     }
 
-    if (fileObj && fileObj.type === 'application/pdf') {
-      setPhotoImg(fileObj);
-      loadPdfFile(fileObj, 1);
-    } else if (fileObj?.type?.startsWith?.('image/')) {
-       setPhotoImg(fileObj);
+  } catch (error) {
+    console.error('Error checking free trial:', error);
+    setHasFreeTrial(false);
+    setShowSubscriptionDialog(true);
+    const fileInput = document.getElementById('photo_img');
+    if (fileInput) fileInput.value = '';
+    return;
+  }
+
+  // File handling logic
+  if (fileObj && fileObj.type === 'application/pdf') {
+    setPhotoImg(fileObj);
+    loadPdfFile(fileObj, 1);
+  } else if (fileObj?.type?.startsWith?.('image/')) {
+    setPhotoImg(fileObj);
     setNumPages(0);
     setCurrentPage(1);
     loadImageFile(fileObj);
@@ -540,11 +546,13 @@ const loadImageFile = file => {
     dispatch(fetchError('Invalid file format'));
   }
 
+  // Clear input
   const fileInput = document.getElementById('photo_img');
   if (fileInput) {
     fileInput.value = '';
   }
 };
+
 const handleMouseDown = e => {
   const canvas = canvasRef.current;
   if (!canvas) return;
@@ -860,28 +868,36 @@ const handleDeleteImage = async (id, isFullObject = false) => {
     }
   };
 
-  const handleScanButtonClick = async () => {
-    // Check free trial first on every scan
-    try {
-      const response = await freeTrialCheck();
-      if (response.status !== 200 || response.trial !== true) {
-        setHasFreeTrial(false);
-        setShowSubscriptionDialog(true);
-        return;
-      }
-      setHasFreeTrial(true);
-    } catch (error) {
-      console.error('Error checking free trial:', error);
+const handleScanButtonClick = async () => {
+  try {
+    const response = await freeTrialCheck();
+    if (response?.payment_success === false) {
       setHasFreeTrial(false);
       setShowSubscriptionDialog(true);
       return;
     }
+    if (response?.payment_status === "order.success") {
+      setHasFreeTrial(true);
+    } else {
+      // Fallback case — treat as no access
+      setHasFreeTrial(false);
+      setShowSubscriptionDialog(true);
+      return;
+    }
+  } catch (error) {
+    console.error('Error checking free trial:', error);
+    setHasFreeTrial(false);
+    setShowSubscriptionDialog(true);
+    return;
+  }
 
-    setOpenScan(true);
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    videoRef.current.srcObject = stream;
-    videoRef.current.play();
-  };
+  // Start scan if all checks pass
+  setOpenScan(true);
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  videoRef.current.srcObject = stream;
+  videoRef.current.play();
+};
+
 
   const handleSubscriptionRedirect = () => {
     setShowSubscriptionDialog(false);

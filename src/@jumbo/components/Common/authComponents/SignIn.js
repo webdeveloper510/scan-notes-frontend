@@ -109,7 +109,7 @@ const SignIn = ({ method = CurrentAuthMethod, variant = 'default', wrapperVarian
             <FormControlLabel
               className={classes.formcontrolLabelRoot}
               control={<Checkbox name="checkedA" />}
-              label="Remember me"
+              label={<IntlMessages id="appModule.rememberMe" />}
             />
             <Box component="p" fontSize={{ xs: 12, sm: 16 }}>
               <NavLink to="/forgot-password">

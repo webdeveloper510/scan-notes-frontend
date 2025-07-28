@@ -109,7 +109,7 @@ const ForgotPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapp
 
           <div>
             <Typography>
-              Don't remember your email?
+              <IntlMessages id="forgotEmail" />
               <span className={'ml-2'}>
                 <Link href="/contact-us">
                   <IntlMessages id="appModule.contactSupport" />

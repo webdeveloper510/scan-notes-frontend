@@ -725,6 +725,11 @@
 "appModule.school": "Nome della scuola / conservatorio",
 "appModule.teacher": "Insegnante? (SÌ/NO)",
 "appModule.software": "Come hai scoperto il software?",
-"navbar.managesubscription": "Gestisci abbonamento"
+"navbar.managesubscription": "Gestisci abbonamento",
+"history.thumbnail": "Miniatura",
+"history.column": "Colonna",
+"history.view": "Visualizza",
+"history.edit": "Modifica",
+"forgotEmail": "Non ricordi la tua email?"
 
 }

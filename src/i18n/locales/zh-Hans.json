@@ -725,6 +725,11 @@
   "appModule.school": "学校 / 音乐学院名称",
   "appModule.teacher": "是教师吗？（是/否）",
   "appModule.software": "您是如何得知该软件的？",
-  "navbar.managesubscription": "管理订阅"
+  "navbar.managesubscription": "管理订阅",
+"history.thumbnail": "缩略图",
+"history.column": "列",
+"history.view": "查看",
+"history.edit": "编辑",
+"forgotEmail": "不记得你的邮箱？"
 
 }

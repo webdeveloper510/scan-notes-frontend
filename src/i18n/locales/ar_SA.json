@@ -726,6 +726,11 @@
   "appModule.school": "اسم المدرسة / المعهد",
   "appModule.teacher": "هل أنت معلم؟ (نعم/لا)",
   "appModule.software": "كيف عرفت عن البرنامج؟",
-  "navbar.managesubscription": "إدارة الاشتراك"
+  "navbar.managesubscription": "إدارة الاشتراك",
+"history.thumbnail": "صورة مصغرة",
+"history.column": "عمود",
+"history.view": "عرض",
+"history.edit": "تعديل",
+"forgotEmail": "لا تتذكر بريدك الإلكتروني؟"
 
 }
