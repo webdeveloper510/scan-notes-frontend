@@ -232,7 +232,10 @@ const HistoryPage = () => {
   }, []);
 
   const handleEdit = (item) => {
-    history.push(`/dashboard?id=${item.id}`);
+    history.push(`/dashboard?id=${item.id}`, {
+      title: item.title,
+      COMPOSER: item.COMPOSER,
+    });
   };
 
   const handleView = (item) => {
@@ -250,6 +253,9 @@ const HistoryPage = () => {
         selectedImageURL,
         photo_img: item.orignal_image,
         viewOnly: true,
+          title: item.title,        
+      COMPOSER: item.COMPOSER, 
+      object_id: item.id,
       },
     });
   };

@@ -442,7 +442,9 @@ const handleGotoDetailClick = () => {
     state: { 
       selectedImageURL, 
       photo_img, 
-      object_id: currentObjectId 
+      object_id: currentObjectId,
+      title: props.location.state?.title || '',
+      COMPOSER: props.location.state?.COMPOSER || '',
     },
   });
 };

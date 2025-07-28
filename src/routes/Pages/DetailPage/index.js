@@ -137,8 +137,15 @@ const DetailPage = props => {
   const [currentMidi, setCurrentMidi] = useState(0);
   const [showImage, setShowImage] = useState(-1);
   const [selectedColor, setSelectedColor] = useState('red');
-  const [title, setTitle] = useState('');
-  const [composer, setComposer] = useState('');
+    const [title, setTitle] = useState(() => {
+    return props.location.state?.title || '';
+  });
+    console.log("🚀 ~ DetailPage ~ title:", title)
+  
+  const [composer, setComposer] = useState(() => {
+    return props.location.state?.COMPOSER || '';
+  });
+  console.log("🚀 ~ DetailPage ~ composer:", composer)
   const [creationDate] = useState(new Date().toLocaleDateString());
   const [solutions, setSolutions] = useState({});
   
