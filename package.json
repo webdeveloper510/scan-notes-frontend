@@ -32,6 +32,7 @@
     "jss": "^10.2.0",
     "jss-rtl": "^0.3.0",
     "lodash": "^4.17.20",
+    "lucide-react": "^0.528.0",
     "material-table": "^1.65.0",
     "material-ui-popup-state": "^1.6.1",
     "midi-player-js": "^2.0.16",

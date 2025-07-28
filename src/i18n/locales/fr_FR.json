@@ -726,6 +726,7 @@
 "appModule.school": "Nom de l'école / conservatoire",
 "appModule.teacher": "Enseignant ? (OUI/NON)",
 "appModule.software": "Comment avez-vous découvert le logiciel ?",
-"detailPage.actions":"Actes"
+"detailPage.actions":"Actes",
+"navbar.managesubscription": "Gérer l’abonnement"
 
 }

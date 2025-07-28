@@ -12,6 +12,7 @@ import ForgotPassword from '@jumbo/components/Common/authComponents/ForgotPasswo
 import ResetPassword from '@jumbo/components/Common/authComponents/ResetPassword';
 import SubscriptionPage from './Pages/subscription';
 import HistoryPage from './Pages/history';
+import ManageSubscriptionPage from './Pages/subscription/managesubscription.js';
 
 const RestrictedRoute = ({ component: Component, ...rest }) => {
   const { authUser } = useSelector(({ auth }) => auth);
@@ -54,7 +55,9 @@ const Routes = () => {
         <Route path="/forgot-password/:token?" component={ForgotPassword} />
         <Route path="/subscription" component={SubscriptionPage}/>
         <Route path="/history" component={HistoryPage} />
+        <Route path="/manage-subscription" component={ManageSubscriptionPage} />
         <Route component={Error404} />
+
       </Switch>
     </React.Fragment>
   );

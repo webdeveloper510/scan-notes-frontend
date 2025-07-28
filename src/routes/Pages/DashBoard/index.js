@@ -506,7 +506,7 @@ const loadImageFile = file => {
   const handleFileInputChange = async fileObj => {
     try {
       const response = await freeTrialCheck();
-      if (response.status !== 200 || response.trial !== true) {
+     if (response.status !== 200 || response.trial !== true || response.payment_status !== true) {
         setHasFreeTrial(false);
         setShowSubscriptionDialog(true);
         const fileInput = document.getElementById('photo_img');

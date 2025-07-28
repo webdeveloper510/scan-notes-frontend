@@ -123,7 +123,13 @@ const Header = () => {
           </Typography>
         </Link>
       </Box>
-
+  <Box mx={1}>
+        <Link to="/manage-subscription" className={classes.linkText}>
+          <Typography variant="body1">
+            <IntlMessages id="navbar.managesubscription" />
+          </Typography>
+        </Link>
+      </Box>
       {/* Added Bug Report link */}
       {/* <Box mx={1}>
         <Link to="/bug-report" className={classes.linkText}>

@@ -725,5 +725,6 @@
   "dashboard.buysubscription":"Buy Subscription",
   "dashboard.cancel": "Cancel",
   "sidebar.history": "History",
-  "detailPage.actions":"Actions"
+  "detailPage.actions":"Actions",
+  "navbar.managesubscription": "Manage Subscription"
 }

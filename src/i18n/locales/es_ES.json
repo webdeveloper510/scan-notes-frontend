@@ -724,6 +724,7 @@
 "appModule.birthday": "Fecha de nacimiento",
 "appModule.school": "Nombre de la escuela / conservatorio",
 "appModule.teacher": "¿Profesor? (SÍ/NO)",
-"appModule.software": "¿Cómo supiste del software?"
+"appModule.software": "¿Cómo supiste del software?",
+"navbar.managesubscription": "Gestionar suscripción"
 
 }

@@ -88,41 +88,84 @@ const SubscriptionPage = () => {
   const [thriveCartLoading, setThriveCartLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [error, setError] = useState('');
-  const [loadingTimeout, setLoadingTimeout] = useState(null);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+     let timeoutId = null;
+    let intervalId = null;
+    let scriptLoadTimeout = null;
+
+    // Set up the main timeout for loading failure
+    timeoutId = setTimeout(() => {
       if (thriveCartLoading) {
-        setError('Having trouble loading subscription options. Please refresh the page or try again later.');
+        // setError('Having trouble loading subscription options. Please refresh the page or try again later.');
         setThriveCartLoading(false);
       }
     }, 15000);
-
-    setLoadingTimeout(timeout);
-
     const script = document.createElement('script');
     script.src = "//tinder.thrivecart.com/embed/v2/thrivecart.js";
     script.async = true;
     script.id = "tc-lirelamusique-32-J0I18V";
+    
     script.onload = () => {
-      setTimeout(() => {
-        setThriveCartLoading(false);
-        if (timeout) clearTimeout(timeout);
-      }, 2000);
+      console.log('ThriveCart script loaded');
+      
+      scriptLoadTimeout = setTimeout(() => {
+        if (thriveCartLoading) {
+          console.log('ThriveCart script loaded but content not detected, checking for content...');
+          intervalId = setInterval(() => {
+            const thriveCartElement = document.querySelector('.tc-v2-embeddable-target');
+            
+            if (thriveCartElement) {
+              const hasContent = 
+                thriveCartElement.children.length > 0 && 
+                (
+                  thriveCartElement.querySelector('form') ||
+                  thriveCartElement.querySelector('button') ||
+                  thriveCartElement.querySelector('.tc-product') ||
+                  thriveCartElement.querySelector('[class*="price"]') ||
+                  thriveCartElement.textContent.trim().length > 50
+                );
+              
+              if (hasContent) {
+                console.log('ThriveCart content detected');
+                setThriveCartLoading(false);
+                clearInterval(intervalId);
+                if (timeoutId) clearTimeout(timeoutId);
+              }
+            }
+          }, 500); 
+        }
+      }, 1000);
     };
+    
     script.onerror = () => {
+      console.error('Failed to load ThriveCart script');
       setError('Failed to load subscription options. Please refresh the page.');
       setThriveCartLoading(false);
-      if (timeout) clearTimeout(timeout);
+      if (timeoutId) clearTimeout(timeoutId);
     };
 
     document.body.appendChild(script);
-    const checkThriveCartContent = setInterval(() => {
+    const immediateIntervalId = setInterval(() => {
       const thriveCartElement = document.querySelector('.tc-v2-embeddable-target');
-      if (thriveCartElement && thriveCartElement.children.length > 0) {
-        setThriveCartLoading(false);
-        clearInterval(checkThriveCartContent);
-        if (timeout) clearTimeout(timeout);
+      
+      if (thriveCartElement) {
+        const hasContent = 
+          thriveCartElement.children.length > 0 && 
+          (
+            thriveCartElement.querySelector('form') ||
+            thriveCartElement.querySelector('button') ||
+            thriveCartElement.querySelector('.tc-product') ||
+            thriveCartElement.querySelector('[class*="price"]') ||
+            thriveCartElement.textContent.trim().length > 50
+          );
+        
+        if (hasContent) {
+          console.log('ThriveCart content detected (immediate check)');
+          setThriveCartLoading(false);
+          clearInterval(immediateIntervalId);
+          if (timeoutId) clearTimeout(timeoutId);
+        }
       }
     }, 1000);
 
@@ -131,10 +174,12 @@ const SubscriptionPage = () => {
       if (existingScript) {
         existingScript.remove();
       }
-      if (timeout) clearTimeout(timeout);
-      clearInterval(checkThriveCartContent);
+      if (timeoutId) clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+      if (scriptLoadTimeout) clearTimeout(scriptLoadTimeout);
+      clearInterval(immediateIntervalId);
     };
-  }, [thriveCartLoading]);
+  }, []);
 
   return (
     <Box className={classes.root}>
@@ -153,6 +198,9 @@ const SubscriptionPage = () => {
           {thriveCartLoading && (
             <div className={classes.loadingContainer}>
               <CircularProgress size={60} style={{ color: 'white' }} />
+              <Typography variant="body1" className={classes.loadingText}>
+
+              </Typography>
             </div>
           )}
           

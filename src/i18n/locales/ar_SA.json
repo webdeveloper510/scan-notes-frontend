@@ -725,5 +725,7 @@
   "appModule.birthday": "تاريخ الميلاد",
   "appModule.school": "اسم المدرسة / المعهد",
   "appModule.teacher": "هل أنت معلم؟ (نعم/لا)",
-  "appModule.software": "كيف عرفت عن البرنامج؟"
+  "appModule.software": "كيف عرفت عن البرنامج؟",
+  "navbar.managesubscription": "إدارة الاشتراك"
+
 }
