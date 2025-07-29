@@ -43,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 const SidebarHeader = () => {
   const { sidebarTheme } = useContext(SidebarThemeContext);
   const { authUser } = useSelector(({ auth }) => auth);
+  console.log("🚀 ~ SidebarHeader ~ authUser:", authUser)
   const classes = useStyles({ sidebarTheme });
   const dispatch = useDispatch();
 
