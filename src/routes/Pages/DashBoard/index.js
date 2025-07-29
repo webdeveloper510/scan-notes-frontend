@@ -504,35 +504,31 @@ const loadImageFile = file => {
     }
   };
 const handleFileInputChange = async (fileObj) => {
+  const fileInput = document.getElementById('photo_img');
+  
   try {
     const response = await freeTrialCheck();
-
-    const fileInput = document.getElementById('photo_img');
-    if (response?.payment_success === false) {
-      setHasFreeTrial(false);
-      setShowSubscriptionDialog(true);
-      if (fileInput) fileInput.value = '';
-      return;
-    }
-    if (response?.payment_status === "order.success") {
+    console.log("🚀 ~ handleFileInputChange ~ response:", response)
+    const { trial, payment_status } = response || {};
+    if (trial === true) {
       setHasFreeTrial(true);
     } else {
-      setHasFreeTrial(false);
-      setShowSubscriptionDialog(true);
-      if (fileInput) fileInput.value = '';
-      return;
+      if (payment_status === "order.success") {
+        setHasFreeTrial(true);
+      } else {
+        setHasFreeTrial(false);
+        setShowSubscriptionDialog(true);
+        if (fileInput) fileInput.value = '';
+        return;
+      }
     }
-
   } catch (error) {
     console.error('Error checking free trial:', error);
     setHasFreeTrial(false);
     setShowSubscriptionDialog(true);
-    const fileInput = document.getElementById('photo_img');
     if (fileInput) fileInput.value = '';
     return;
   }
-
-  // File handling logic
   if (fileObj && fileObj.type === 'application/pdf') {
     setPhotoImg(fileObj);
     loadPdfFile(fileObj, 1);
@@ -546,8 +542,6 @@ const handleFileInputChange = async (fileObj) => {
     dispatch(fetchError('Invalid file format'));
   }
 
-  // Clear input
-  const fileInput = document.getElementById('photo_img');
   if (fileInput) {
     fileInput.value = '';
   }
@@ -558,8 +552,6 @@ const handleMouseDown = e => {
   if (!canvas) return;
   
   const rect = canvas.getBoundingClientRect();
-
-  // Get mouse position relative to the canvas element
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
@@ -568,8 +560,7 @@ const handleMouseDown = e => {
   setStartY(y);
   setEndX(x);
   setEndY(y);
-  
-  // Prevent default to avoid any browser drag behavior
+
   e.preventDefault();
 };
 
@@ -577,12 +568,8 @@ const handleMouseMove = e => {
   const enlargedImage = document.querySelector('#enlarged-image');
   const canvas = canvasRef.current;
   const rect = canvas.getBoundingClientRect();
-
-  // Get current mouse position relative to canvas element
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
-
-  // Handle zoom focus display logic (only when not dragging)
   if (!isDragging) {
     if (!zoomFocus) {
       if (enlargedImage) enlargedImage.style.display = 'none';
@@ -871,18 +858,18 @@ const handleDeleteImage = async (id, isFullObject = false) => {
 const handleScanButtonClick = async () => {
   try {
     const response = await freeTrialCheck();
-    if (response?.payment_success === false) {
-      setHasFreeTrial(false);
-      setShowSubscriptionDialog(true);
-      return;
-    }
-    if (response?.payment_status === "order.success") {
+    const { trial, payment_status } = response || {};
+
+    if (trial === true) {
       setHasFreeTrial(true);
     } else {
-      // Fallback case — treat as no access
-      setHasFreeTrial(false);
-      setShowSubscriptionDialog(true);
-      return;
+      if (payment_status === "order.success") {
+        setHasFreeTrial(true);
+      } else {
+        setHasFreeTrial(false);
+        setShowSubscriptionDialog(true);
+        return;
+      }
     }
   } catch (error) {
     console.error('Error checking free trial:', error);
@@ -890,8 +877,6 @@ const handleScanButtonClick = async () => {
     setShowSubscriptionDialog(true);
     return;
   }
-
-  // Start scan if all checks pass
   setOpenScan(true);
   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
   videoRef.current.srcObject = stream;

@@ -730,6 +730,7 @@
 "history.column": "Colonna",
 "history.view": "Visualizza",
 "history.edit": "Modifica",
-"forgotEmail": "Non ricordi la tua email?"
+"forgotEmail": "Non ricordi la tua email?",
+"signIn.login": "Accedi"
 
 }

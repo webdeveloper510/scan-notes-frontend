@@ -732,6 +732,7 @@
 "history.column": "Colonne",
 "history.view": "Voir",
 "history.edit": "Modifier",
-"forgotEmail": "Vous ne vous souvenez pas de votre email ?"
+"forgotEmail": "Vous ne vous souvenez pas de votre email ?",
+"signIn.login": "Connexion"
 
 }

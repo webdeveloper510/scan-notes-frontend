@@ -62,7 +62,6 @@ const ForgotPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapp
 
     try {
       const response = await dispatch(AuhMethods[method].onForgotPassword({ email }));
-
       if (response?.success==true) {
         toast.success(response.message || 'Reset link sent to your email');
       } else {
@@ -86,7 +85,7 @@ const ForgotPassword = ({ method = CurrentAuthMethod, variant = 'default', wrapp
           <CmtImage src={'/images/logo.png'} />
         </div>
         <Typography component="div" variant="h1" className={classes.titleRoot}>
-          Forgot Password
+          <IntlMessages id="sidebar.appModule.forgotPassword" />
         </Typography>
 
         <form>

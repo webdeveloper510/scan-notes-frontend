@@ -730,6 +730,7 @@
 "history.column": "列",
 "history.view": "查看",
 "history.edit": "编辑",
-"forgotEmail": "不记得你的邮箱？"
+"forgotEmail": "不记得你的邮箱？",
+"signIn.login": "登录"
 
 }

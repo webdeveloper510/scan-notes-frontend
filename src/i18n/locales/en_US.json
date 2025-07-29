@@ -731,5 +731,6 @@
   "history.column": "Column",
   "history.view": "View",
   "history.edit": "Edit",
-  "forgotEmail":"Don't remember your email?"
+  "forgotEmail":"Don't remember your email?",
+  "signIn.login": "Login"
 }

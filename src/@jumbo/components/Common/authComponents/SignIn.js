@@ -79,7 +79,7 @@ const SignIn = ({ method = CurrentAuthMethod, variant = 'default', wrapperVarian
           <CmtImage src={'/images/logo.png'} />
         </Box>
         <Typography component="div" variant="h1" className={classes.titleRoot}>
-          Login
+          <IntlMessages id="signIn.login" />
         </Typography>
         <form>
           <Box mb={2}>
