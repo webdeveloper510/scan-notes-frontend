@@ -732,6 +732,10 @@
 "history.view": "عرض",
 "history.edit": "تعديل",
 "forgotEmail": "لا تتذكر بريدك الإلكتروني؟",
-"signIn.login": "تسجيل الدخول"
-
+"signIn.login": "تسجيل الدخول",
+"detailPage.write": "اكتب حلك",
+  "buttons.saveTitleComposer": "حفظ العنوان والمؤلف",
+  "buttons.print": "طباعة",
+  "buttons.download": "تنزيل",
+  "buttons.goBack": "رجوع"
 }

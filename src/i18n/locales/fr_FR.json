@@ -733,6 +733,10 @@
 "history.view": "Voir",
 "history.edit": "Modifier",
 "forgotEmail": "Vous ne vous souvenez pas de votre email ?",
-"signIn.login": "Connexion"
-
+"signIn.login": "Connexion",
+"detailPage.write": "Écrire comment corriger le problème",
+  "buttons.saveTitleComposer": "Enregistrer titre et compositeur",
+  "buttons.print": "Imprimer",
+  "buttons.download": "Télécharger",
+  "buttons.goBack": "Retour"
 }

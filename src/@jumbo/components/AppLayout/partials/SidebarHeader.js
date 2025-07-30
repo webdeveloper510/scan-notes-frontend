@@ -62,6 +62,7 @@ const SidebarHeader = () => {
   const onLogoutClick = () => {
     handlePopoverClose();
     dispatch(AuhMethods[CurrentAuthMethod].onLogout());
+    History.push('/login');
   };
 
   return (

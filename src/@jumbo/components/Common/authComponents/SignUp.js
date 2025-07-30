@@ -259,10 +259,10 @@ const SignUp = ({ method = CurrentAuthMethod, variant = 'default', wrapperVarian
 
         <Box mb={3}>{dispatch(AuhMethods[method].getSocialMediaIcons())}</Box>
 
-        <Typography className={classes.textAcc}>
+        {/* <Typography className={classes.textAcc}>
           Have an account?
           <NavLink to="/signin">Sign In</NavLink>
-        </Typography>
+        </Typography> */}
         <ContentLoader />
       </Box>
     </AuthWrapper>

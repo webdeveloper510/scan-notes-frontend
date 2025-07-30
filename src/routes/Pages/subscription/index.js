@@ -29,7 +29,7 @@ import {
 } from '@material-ui/icons';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { makeStyles } from '@material-ui/core/styles';
-import { useSelector } from 'react-redux';
+
 const useStyles = makeStyles((theme) => ({
   root: {
     minHeight: '100vh',
@@ -88,7 +88,7 @@ const SubscriptionPage = () => {
   const [thriveCartLoading, setThriveCartLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [error, setError] = useState('');
-const { authUser } = useSelector(({ auth }) => auth);
+
   useEffect(() => {
      let timeoutId = null;
     let intervalId = null;
@@ -212,7 +212,6 @@ const { authUser } = useSelector(({ auth }) => auth);
             data-thrivecart-tpl="v2"
             data-thrivecart-product="32"
             data-thrivecart-embeddable="tc-lirelamusique-32-J0I18V"
-            data-thrivecart-customer-email={authUser?.email || ""}
           />
         </div>
       </Container>

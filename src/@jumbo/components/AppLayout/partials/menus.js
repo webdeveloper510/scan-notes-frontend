@@ -1,6 +1,7 @@
 import React from 'react';
 import { PostAdd, History } from '@material-ui/icons'; 
 import IntlMessages from '../../../utils/IntlMessages';
+import Payment from '@material-ui/icons/Payment'; 
 
 export const sidebarNavs = [
   {
@@ -18,6 +19,12 @@ export const sidebarNavs = [
         type: 'item',
         icon: <History />,
         link: '/history',
+      },
+       {
+        name: <IntlMessages id={'navbar.managesubscription'} />,
+        type: 'item',
+       icon: <Payment />,
+        link: '/manage-subscription',
       },
     ],
   },

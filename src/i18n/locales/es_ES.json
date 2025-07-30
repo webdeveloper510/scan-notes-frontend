@@ -731,6 +731,10 @@
 "history.view": "Ver",
 "history.edit": "Editar",
 "forgotEmail": "¿No recuerdas tu correo electrónico?",
-"signIn.login": "Iniciar sesión"
-
+"signIn.login": "Iniciar sesión",
+"detailPage.write": "Escribe cómo corregir el problema",
+  "buttons.saveTitleComposer": "Guardar título y compositor",
+  "buttons.print": "Imprimir",
+  "buttons.download": "Descargar",
+  "buttons.goBack": "Volver"
 }

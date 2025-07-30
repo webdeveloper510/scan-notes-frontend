@@ -731,6 +731,10 @@
 "history.view": "查看",
 "history.edit": "编辑",
 "forgotEmail": "不记得你的邮箱？",
-"signIn.login": "登录"
-
+"signIn.login": "登录",
+"detailPage.write": "写下你的解决方案",
+  "buttons.saveTitleComposer": "保存标题和作曲者",
+  "buttons.print": "打印",
+  "buttons.download": "下载",
+  "buttons.goBack": "返回"
 }

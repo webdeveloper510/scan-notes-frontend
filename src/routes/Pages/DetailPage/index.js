@@ -39,7 +39,6 @@ import CmtCardHeader from '../../../@coremat/CmtCard/CmtCardHeader';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { useTheme } from '@material-ui/core/styles';
 import clsx from 'clsx';
-
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { titleComposerData } from 'services/auth/Basic/api';
@@ -590,178 +589,191 @@ const handleSaveTitleComposer = () => {
         }
       `}</style>
       <GridContainer>
-        <Grid item xs={12}>
-          <CmtCard className={classes.cardRoot}>
-            <Box display="flex" justifyContent="flex-end" p={2} pt={4}>
-              <Box mx={1}>
-                <Tooltip title="Save Title & Composer" aria-label="Save">
-                  <Button color="secondary" variant="contained" onClick={handleSaveTitleComposer}>
-                    Save
-                  </Button>
-                </Tooltip>
-              </Box>
-              <Box mx={1}>
-                <Tooltip title="Print" aria-label="Print">
-                  <Button color="primary" variant="contained" onClick={handlePrintClick}>
-                    <Print />
-                  </Button>
-                </Tooltip>
-              </Box>
-              <Box mx={1}>
-                <Tooltip title="Download" aria-label="Download">
-                  <Button color="primary" variant="contained" onClick={handleDownloadClick}>
-                    <CloudDownload />
-                  </Button>
-                </Tooltip>
-              </Box>
-              <Box mx={1}>
-                <Tooltip title="Go Back" aria-label="Go Back">
-                  <Button color="primary" onClick={handleGoBackClick}>
-                    <Undo />
-                  </Button>
-                </Tooltip>
-              </Box>
-            </Box>
-            <CmtCardContent className={classes.cardContentRoot}>
-              <div id="header-info" className={classes.headerInfo}>
-                <Typography variant="h5" gutterBottom align='center'>
-                  <IntlMessages id="detailPage.worksheett" />
-                </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={4}>
-                    <TextField
-                      fullWidth
-                      label={<IntlMessages id="detailpage.Title" />}
-                      value={title}
-                      onChange={handleTitleChange}
-                      onBlur={handleTitleBlur}
-                      variant="outlined"
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <TextField
-                      fullWidth
-                      label={<IntlMessages id="detailPage.composer" />}
-                      value={composer}
-                      onChange={handleComposerChange}
-                      onBlur={handleComposerBlur}
-                      variant="outlined"
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <TextField
-                      fullWidth
-                      label={<IntlMessages id="detailPage.date" />}
-                      value={creationDate}
-                      variant="outlined"
-                      margin="normal"
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </div>
 
-              <div className="Cmt-table-responsive" id="scan-table">
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell width="20">#</TableCell>
-                      <TableCell className={classes.imageColumn}>
-                        {<IntlMessages id="detailPage.image" />}
-                      </TableCell>
-                      <TableCell className={classes.solutionColumn}>
-                        {<IntlMessages id="detailPage.solution" />}
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {results.map((result, index) => (
-                      <TableRow 
-                        key={result.id}
-                        className={clsx(
-                          classes.draggableRow,
-                          classes.tableRowDraggable,
-                          dragOverItem && dragOverItem.id === result.id && classes.draggedOver,
-                          draggedItem && draggedItem.id === result.id && classes.beingDragged,
-                        )}
-                        draggable
-                        onDragStart={e => handleDragStart(e, result)}
-                        onDragOver={e => handleDragOver(e, result)}
-                        onDragEnter={handleDragEnter}
-                        onDragLeave={handleDragLeave}
-                        onDrop={e => handleDrop(e, result)}
-                        onDragEnd={handleDragEnd}
-                      >
-                        <TableCell>
-                        </TableCell>
-                        <TableCell className={classes.imageColumn}>
-                          <div className={`jr-card-thumb image-container pb-0 ${classes.imageContainer}`}>
-                            <CmtImage id={`second_image${result.id}`} src={result.image} style={{ objectFit: 'cover' }} />
-                            <IconButton
-                              className={classes.editImage}
-                              variant="contained"
-                              color="secondary"
-                              onClick={() => handleEditImageClick(result.id)}
-                              id={`pencil-${index}`}>
-                              <Edit />
-                            </IconButton>
-                          </div>
-                        </TableCell>
-                        <TableCell 
-                          className={`${classes.solutionColumn} solution-column`}
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          <TextField
-                            fullWidth
-                            multiline
-                            variant="outlined"
-                            placeholder="write your solution..."
-                            value={solutions[result.id] || ''}
-                            onChange={(e) => handleSolutionChange(result.id, e.target.value)}
-                            rows={6}
-                            style={{ 
-                              minHeight: '120px',
-                              backgroundColor: '#ffffff',
-                              cursor: 'text',
-                            }}
-                            InputProps={{
-                              style: {
-                                fontSize: '14px',
-                                lineHeight: '1.5',
-                                padding: '12px',
-                                cursor: 'text',
-                              },
-                            }}
-                            inputProps={{
-                              style: {
-                                resize: 'vertical',
-                                minHeight: '100px',
-                                cursor: 'text',
-                              },
-                              onMouseDown: (e) => {
-                                e.stopPropagation();
-                              },
-                              onClick: (e) => {
-                                e.target.focus();
-                                e.stopPropagation();
-                              },
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CmtCardContent>
-          </CmtCard>
+
+<Grid item xs={12}>
+  <CmtCard className={classes.cardRoot}>
+<Box display="flex" justifyContent="flex-end" p={2} pt={4} gap={12}>
+  {/* SAVE Button with label below */}
+  <Box display="flex" flexDirection="column" alignItems="center" mx={1}>
+    <Button color="secondary" variant="contained" onClick={handleSaveTitleComposer}>
+      SAVE
+    </Button>
+    <Typography variant="caption" color="" mt={1}>
+      <IntlMessages id="buttons.saveTitleComposer" />
+    </Typography>
+  </Box>
+
+  {/* PRINT Button with label below */}
+  <Box display="flex" flexDirection="column" alignItems="center" mx={1}>
+    <Button color="primary" variant="contained" onClick={handlePrintClick}>
+      <Print />
+    </Button>
+    <Typography variant="caption" color="" mt={1}>
+      <IntlMessages id="buttons.print" />
+    </Typography>
+  </Box>
+
+  {/* DOWNLOAD Button with label below */}
+  <Box display="flex" flexDirection="column" alignItems="center" mx={1}>
+    <Button color="primary" variant="contained" onClick={handleDownloadClick}>
+      <CloudDownload />
+    </Button>
+    <Typography variant="caption" color="" mt={1}>
+      <IntlMessages id="buttons.download" />
+    </Typography>
+  </Box>
+
+  {/* GO BACK Button with label below */}
+  <Box display="flex" flexDirection="column" alignItems="center" mx={1}>
+    <Button color="primary" onClick={handleGoBackClick}>
+      <Undo />
+    </Button>
+    <Typography variant="caption" color="" mt={1}>
+      <IntlMessages id="buttons.goBack" />
+    </Typography>
+  </Box>
+</Box>
+    <CmtCardContent className={classes.cardContentRoot}>
+      <div id="header-info" className={classes.headerInfo}>
+        <Typography variant="h5" gutterBottom align='center'>
+          <IntlMessages id="detailPage.worksheett" />
+        </Typography>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label={<IntlMessages id="detailpage.Title" />}
+              value={title}
+              onChange={handleTitleChange}
+              onBlur={handleTitleBlur}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label={<IntlMessages id="detailPage.composer" />}
+              value={composer}
+              onChange={handleComposerChange}
+              onBlur={handleComposerBlur}
+              variant="outlined"
+              margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label={<IntlMessages id="detailPage.date" />}
+              value={creationDate}
+              variant="outlined"
+              margin="normal"
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          </Grid>
         </Grid>
+      </div>
+
+      <div className="Cmt-table-responsive" id="scan-table">
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell width="20">#</TableCell>
+              <TableCell className={classes.imageColumn}>
+                <IntlMessages id="detailPage.image" />
+              </TableCell>
+              <TableCell className={classes.solutionColumn}>
+                <IntlMessages id="detailPage.solution" />
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {results.map((result, index) => (
+              <TableRow
+                key={result.id}
+                className={clsx(
+                  classes.draggableRow,
+                  classes.tableRowDraggable,
+                  dragOverItem && dragOverItem.id === result.id && classes.draggedOver,
+                  draggedItem && draggedItem.id === result.id && classes.beingDragged,
+                )}
+                draggable
+                onDragStart={e => handleDragStart(e, result)}
+                onDragOver={e => handleDragOver(e, result)}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDrop={e => handleDrop(e, result)}
+                onDragEnd={handleDragEnd}
+              >
+                <TableCell></TableCell>
+                <TableCell className={classes.imageColumn}>
+                  <div className={`jr-card-thumb image-container pb-0 ${classes.imageContainer}`}>
+                    <CmtImage id={`second_image${result.id}`} src={result.image} style={{ objectFit: 'cover' }} />
+                    <IconButton
+                      className={classes.editImage}
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => handleEditImageClick(result.id)}
+                      id={`pencil-${index}`}>
+                      <Edit />
+                    </IconButton>
+                  </div>
+                </TableCell>
+                <TableCell
+                  className={`${classes.solutionColumn} solution-column`}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    multiline
+                    variant="outlined"
+                    placeholder={intl.formatMessage({ id: 'detailPage.write' })}
+                    value={solutions[result.id] || ''}
+                    onChange={(e) => handleSolutionChange(result.id, e.target.value)}
+                    rows={6}
+                    style={{
+                      minHeight: '120px',
+                      backgroundColor: '#ffffff',
+                      cursor: 'text',
+                    }}
+                    InputProps={{
+                      style: {
+                        fontSize: '14px',
+                        lineHeight: '1.5',
+                        padding: '12px',
+                        cursor: 'text',
+                      },
+                    }}
+                    inputProps={{
+                      style: {
+                        resize: 'vertical',
+                        minHeight: '100px',
+                        cursor: 'text',
+                      },
+                      onMouseDown: (e) => {
+                        e.stopPropagation();
+                      },
+                      onClick: (e) => {
+                        e.target.focus();
+                        e.stopPropagation();
+                      },
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </CmtCardContent>
+  </CmtCard>
+</Grid>
+
       </GridContainer>
       <Dialog
         fullScreen={fullScreen}

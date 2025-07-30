@@ -731,6 +731,10 @@
 "history.view": "Visualizza",
 "history.edit": "Modifica",
 "forgotEmail": "Non ricordi la tua email?",
-"signIn.login": "Accedi"
-
+"signIn.login": "Accedi",
+"detailPage.write": "Scrivi la tua soluzione",
+  "buttons.saveTitleComposer": "Salva titolo e compositore",
+  "buttons.print": "Stampa",
+  "buttons.download": "Scarica",
+  "buttons.goBack": "Indietro"
 }

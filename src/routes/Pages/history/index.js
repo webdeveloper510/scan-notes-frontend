@@ -207,7 +207,7 @@ const HistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [editingItems, setEditingItems] = useState(new Set());
-  const [displayMode, setDisplayMode] = useState('thumbnail'); // 'thumbnail' or 'column'
+  const [displayMode, setDisplayMode] = useState('column'); // 'thumbnail' or 'column'
   const [sortConfig, setSortConfig] = useState({
     key: 'created_at',
     direction: 'desc',
