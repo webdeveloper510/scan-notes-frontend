@@ -139,12 +139,10 @@ const DetailPage = props => {
     const [title, setTitle] = useState(() => {
     return props.location.state?.title || '';
   });
-    console.log("🚀 ~ DetailPage ~ title:", title)
-  
+
   const [composer, setComposer] = useState(() => {
     return props.location.state?.COMPOSER || '';
   });
-  console.log("🚀 ~ DetailPage ~ composer:", composer)
   const [creationDate] = useState(new Date().toLocaleDateString());
   const [solutions, setSolutions] = useState({});
   
@@ -152,8 +150,6 @@ const DetailPage = props => {
   const [objectId, setObjectId] = useState(() => {
     return props.location.state?.object_id || '0';
   });
-  console.log("🚀 ~ DetailPage ~ objectId:", objectId)
-
   const intl = useIntl();
   const worksheetLabel = intl.formatMessage({ id: 'detailPage.worksheet' });
   const solutionLabel = intl.formatMessage({ id: 'detailPage.solution' });

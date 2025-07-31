@@ -738,5 +738,20 @@
   "buttons.saveTitleComposer": "Enregistrer titre et compositeur",
   "buttons.print": "Imprimer",
   "buttons.download": "Télécharger",
-  "buttons.goBack": "Retour"
+  "buttons.goBack": "Retour",
+  "subscription.scanNotesManagement": "Scan Notes - Gestion des abonnements",
+  "subscription.manageYourPlan": "Gérez votre forfait",
+  "subscription.description": "Suivez votre abonnement Scan Notes et profitez d'une numérisation de documents fluide",
+  "subscription.currentPlan": "Forfait actuel",
+  "subscription.perMonth": "/mois",
+  "subscription.invoiceId": "ID de la facture",
+  "subscription.email": "Email",
+  "subscription.startDate": "Date de début",
+  "subscription.dueDate": "Date d'échéance",
+  "subscription.feature.unlimitedScan": "Numérisation illimitée de documents",
+  "subscription.feature.advancedOCR": "Technologie OCR avancée",
+  "subscription.feature.cloudSync": "Stockage cloud et synchronisation",
+  "subscription.feature.premiumSecurity": "Fonctionnalités de sécurité premium",
+  "subscription.cancelButton": "Annuler l’abonnement",
+  "subscription.noDataFound": "Aucune donnée d’abonnement trouvée."
 }

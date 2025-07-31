@@ -737,5 +737,21 @@
   "buttons.saveTitleComposer": "حفظ العنوان والمؤلف",
   "buttons.print": "طباعة",
   "buttons.download": "تنزيل",
-  "buttons.goBack": "رجوع"
+  "buttons.goBack": "رجوع",
+  
+  "subscription.scanNotesManagement": "Scan Notes - إدارة الاشتراك",
+  "subscription.manageYourPlan": "إدارة خطتك",
+  "subscription.description": "تابع اشتراكك في Scan Notes واستمتع بمسح المستندات بسلاسة",
+  "subscription.currentPlan": "الخطة الحالية",
+  "subscription.perMonth": "/شهريًا",
+  "subscription.invoiceId": "رقم الفاتورة",
+  "subscription.email": "البريد الإلكتروني",
+  "subscription.startDate": "تاريخ البدء",
+  "subscription.dueDate": "تاريخ الاستحقاق",
+  "subscription.feature.unlimitedScan": "مسح مستندات غير محدود",
+  "subscription.feature.advancedOCR": "تقنية OCR المتقدمة",
+  "subscription.feature.cloudSync": "تخزين سحابي ومزامنة",
+  "subscription.feature.premiumSecurity": "ميزات الأمان المتقدمة",
+  "subscription.cancelButton": "إلغاء الاشتراك",
+  "subscription.noDataFound": "لم يتم العثور على بيانات الاشتراك."
 }

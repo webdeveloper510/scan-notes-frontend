@@ -736,5 +736,21 @@
   "buttons.saveTitleComposer": "Guardar título y compositor",
   "buttons.print": "Imprimir",
   "buttons.download": "Descargar",
-  "buttons.goBack": "Volver"
+  "buttons.goBack": "Volver",
+  "subscription.scanNotesManagement": "Scan Notes - Gestión de suscripciones",
+  "subscription.manageYourPlan": "Administra tu plan",
+  "subscription.description": "Haz un seguimiento de tu suscripción de Scan Notes y disfruta de un escaneo de documentos sin problemas",
+  "subscription.currentPlan": "Plan actual",
+  "subscription.perMonth": "/mes",
+  "subscription.invoiceId": "ID de factura",
+  "subscription.email": "Correo electrónico",
+  "subscription.startDate": "Fecha de inicio",
+  "subscription.dueDate": "Fecha de vencimiento",
+  "subscription.feature.unlimitedScan": "Escaneo de documentos ilimitado",
+  "subscription.feature.advancedOCR": "Tecnología OCR avanzada",
+  "subscription.feature.cloudSync": "Almacenamiento en la nube y sincronización",
+  "subscription.feature.premiumSecurity": "Funciones de seguridad premium",
+  "subscription.cancelButton": "Cancelar suscripción",
+  "subscription.noDataFound": "No se encontraron datos de suscripción."
+
 }

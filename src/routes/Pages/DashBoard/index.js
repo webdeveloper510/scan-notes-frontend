@@ -48,6 +48,7 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
 import { freeTrialCheck ,deleteHistory} from 'services/auth/Basic/api';
 import { useLocation } from 'react-router-dom/cjs/react-router-dom.min';
+import toast from 'react-hot-toast';
 const breadcrumbs = [
   { label: <IntlMessages id={'sidebar.main'} />, link: '/' },
   { label: <IntlMessages id={'sidebar.dashboard'} />, isActive: true },
@@ -362,7 +363,7 @@ const handleSubmitClick = () => {
       if (response.data.status === 200) {
         dispatch(fetchSuccess('Success!'));
             const responseObjectId = response.data.object_id || response.data.data?.object_id;
-            console.log("🚀 ~ handleSubmitClick ~ responseObjectId:", responseObjectId)
+
         setObjectId(responseObjectId);
         let newSelectedImageURL = [...selectedImageURL];
         newSelectedImageURL.forEach((item, index) => {
@@ -371,6 +372,10 @@ const handleSubmitClick = () => {
         });
         setSelectedImageURL(newSelectedImageURL);
         setGotoDetail(true);
+          setTimeout(() => {
+        window.location.reload();
+      }, 1500); // 1.5 second delay to show success message
+
       } else {
         dispatch(fetchError(response.data.error));
       }
@@ -505,11 +510,20 @@ const loadImageFile = file => {
   };
 const handleFileInputChange = async (fileObj) => {
   const fileInput = document.getElementById('photo_img');
-  
+
   try {
     const response = await freeTrialCheck();
-    console.log("🚀 ~ handleFileInputChange ~ response:", response)
+
+    if (response?.status === 404) {
+    toast.error(response?.message || 'Free trial not available');
+      setHasFreeTrial(false);
+      setShowSubscriptionDialog(false);
+      if (fileInput) fileInput.value = '';
+      return;
+    }
+
     const { trial, payment_status } = response || {};
+
     if (trial === true) {
       setHasFreeTrial(true);
     } else {
@@ -524,8 +538,9 @@ const handleFileInputChange = async (fileObj) => {
     }
   } catch (error) {
     console.error('Error checking free trial:', error);
+    dispatch(fetchError('Something went wrong while checking subscription'));
     setHasFreeTrial(false);
-    setShowSubscriptionDialog(true);
+    setShowSubscriptionDialog(false);
     if (fileInput) fileInput.value = '';
     return;
   }

@@ -736,5 +736,21 @@
   "buttons.saveTitleComposer": "保存标题和作曲者",
   "buttons.print": "打印",
   "buttons.download": "下载",
-  "buttons.goBack": "返回"
+  "buttons.goBack": "返回",
+  "subscription.scanNotesManagement": "Scan Notes - 订阅管理",
+  "subscription.manageYourPlan": "管理您的订阅计划",
+  "subscription.description": "跟踪您的 Scan Notes 订阅，享受流畅的文档扫描体验",
+  "subscription.currentPlan": "当前计划",
+  "subscription.perMonth": "/月",
+  "subscription.invoiceId": "发票编号",
+  "subscription.email": "电子邮件",
+  "subscription.startDate": "开始日期",
+  "subscription.dueDate": "到期日期",
+  "subscription.feature.unlimitedScan": "无限文档扫描",
+  "subscription.feature.advancedOCR": "先进的OCR技术",
+  "subscription.feature.cloudSync": "云存储与同步",
+  "subscription.feature.premiumSecurity": "高级安全功能",
+  "subscription.cancelButton": "取消订阅",
+  "subscription.noDataFound": "未找到订阅数据。"
+
 }

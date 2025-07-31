@@ -11,7 +11,9 @@ import { CurrentAuthMethod } from '../../../constants/AppConstants';
 import AuthWrapper from './AuthWrapper';
 import { NavLink } from 'react-router-dom';
 import { KeyboardDatePicker } from '@material-ui/pickers';
-
+import JWTAuth from 'services/auth/jwt';
+import toast from 'react-hot-toast';
+import { registerUser } from 'services/auth/Basic/api';
 const useStyles = makeStyles(theme => ({
   authThumb: {
     backgroundColor: alpha(theme.palette.primary.main, 0.12),
@@ -75,22 +77,30 @@ const SignUp = ({ method = CurrentAuthMethod, variant = 'default', wrapperVarian
   const dispatch = useDispatch();
   const classes = useStyles({ variant });
 
-  const onSubmit = () => {
-    dispatch(
-      AuhMethods[method].onRegister({
-        email,
-        password,
-        firstName,
-        lastName,
-        phoneNumber,
-        address,
-        birthday,
-        school,
-        teacher,
-        software,
-      }),
-    );
-  };
+const onSubmit = async () => {
+  try {
+    const res = await registerUser({
+      email,
+      password,
+      first_name: firstName,
+      last_name: lastName,
+      phone_number: phoneNumber,
+      address,
+      birthday,
+      school,
+      teacher,
+      software,
+    });
+
+    if (res?.success) {
+      toast.success(res.msg || "User registered successfully!");
+    } else {
+      toast.error(res?.msg || "Registration failed.");
+    }
+  } catch (err) {
+    toast.error("Something went wrong.");
+  }
+};
 
   return (
     <AuthWrapper variant={wrapperVariant}>
