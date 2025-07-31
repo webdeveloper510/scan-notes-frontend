@@ -752,5 +752,9 @@
   "subscription.feature.cloudSync": "Cloud Storage & Sync",
   "subscription.feature.premiumSecurity": "Premium Security Features",
   "subscription.cancelButton": "Cancel Subscription",
-  "subscription.noDataFound": "No subscription data found."
+  "subscription.noDataFound": "No subscription data found.",
+  "subscription.cancelConfirmation": "Are you sure you want to cancel your subscription?",
+  "subscription.cancelTitle": "Cancel Subscription",
+  "subscription.confirmCancel": "Confirm Cancellation",
+  "subscription.keepSubscription": "Keep Subscription"
 }

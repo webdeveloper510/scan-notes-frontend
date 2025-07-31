@@ -11,6 +11,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SidebarThemeContext from '../../../../@coremat/CmtLayouts/SidebarThemeContext/SidebarThemeContext';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -46,6 +47,7 @@ const SidebarHeader = () => {
   console.log("🚀 ~ SidebarHeader ~ authUser:", authUser)
   const classes = useStyles({ sidebarTheme });
   const dispatch = useDispatch();
+const history = useHistory();
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -62,7 +64,7 @@ const SidebarHeader = () => {
   const onLogoutClick = () => {
     handlePopoverClose();
     dispatch(AuhMethods[CurrentAuthMethod].onLogout());
-    History.push('/login');
+    history.push('/signin');
   };
 
   return (

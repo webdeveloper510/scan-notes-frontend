@@ -537,7 +537,7 @@ return (
       ) : (
         <div className={classes.loadingContainer}>
           <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '1.125rem' }}>
-            <IntlMessages id="subscription.noActivePlan" defaultMessage="No active subscription found." />
+            <IntlMessages id="subscription.noDataFound" defaultMessage="No active subscription found." />
           </p>
         </div>
       )}
@@ -551,13 +551,12 @@ return (
       fullWidth
     >
       <DialogTitle className={classes.dialogTitle}>
-        <IntlMessages id="subscription.cancelTitle" defaultMessage="Cancel Subscription" />
+        <IntlMessages id="subscription.cancelTitle"  />
       </DialogTitle>
       <DialogContent className={classes.dialogContent}>
         <p className={classes.dialogText}>
-          <IntlMessages 
-            id="subscription.cancelConfirmation" 
-            defaultMessage="Are you sure you want to cancel your subscription? This action cannot be undone and you will lose access to premium features."
+          <IntlMessages
+            id="subscription.cancelConfirmation"
           />
         </p>
       </DialogContent>

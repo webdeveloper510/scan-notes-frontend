@@ -753,5 +753,9 @@
   "subscription.feature.cloudSync": "تخزين سحابي ومزامنة",
   "subscription.feature.premiumSecurity": "ميزات الأمان المتقدمة",
   "subscription.cancelButton": "إلغاء الاشتراك",
-  "subscription.noDataFound": "لم يتم العثور على بيانات الاشتراك."
+  "subscription.noDataFound": "لم يتم العثور على بيانات الاشتراك.",
+  "subscription.cancelConfirmation": "هل أنت متأكد أنك تريد إلغاء اشتراكك؟",
+  "subscription.cancelTitle": "إلغاء الاشتراك",
+  "subscription.confirmCancel": "تأكيد الإلغاء",
+  "subscription.keepSubscription": "الاحتفاظ بالاشتراك"
 }

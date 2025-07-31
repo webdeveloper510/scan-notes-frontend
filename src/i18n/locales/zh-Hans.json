@@ -751,6 +751,10 @@
   "subscription.feature.cloudSync": "云存储与同步",
   "subscription.feature.premiumSecurity": "高级安全功能",
   "subscription.cancelButton": "取消订阅",
-  "subscription.noDataFound": "未找到订阅数据。"
+  "subscription.noDataFound": "未找到订阅数据。",
+  "subscription.cancelConfirmation": "您确定要取消订阅吗？",
+  "subscription.cancelTitle": "取消订阅",
+  "subscription.confirmCancel": "确认取消",
+"subscription.keepSubscription": "保留订阅"
 
 }

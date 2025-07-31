@@ -753,5 +753,10 @@
   "subscription.feature.cloudSync": "Stockage cloud et synchronisation",
   "subscription.feature.premiumSecurity": "Fonctionnalités de sécurité premium",
   "subscription.cancelButton": "Annuler l’abonnement",
-  "subscription.noDataFound": "Aucune donnée d’abonnement trouvée."
+  "subscription.noDataFound": "Aucune donnée d’abonnement trouvée.",
+  "subscription.cancelConfirmation": "Êtes-vous sûr de vouloir annuler votre abonnement ?",
+  "subscription.cancelTitle": "Annuler l'abonnement",
+  "subscription.confirmCancel": "Confirmer l’annulation",
+"subscription.keepSubscription": "Conserver l’abonnement"
+
 }

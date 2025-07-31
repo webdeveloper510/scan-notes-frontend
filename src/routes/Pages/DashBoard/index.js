@@ -522,12 +522,12 @@ const handleFileInputChange = async (fileObj) => {
       return;
     }
 
-    const { trial, payment_status } = response || {};
+    const { trial, subscription_status } = response || {};
 
     if (trial === true) {
       setHasFreeTrial(true);
     } else {
-      if (payment_status === "order.success") {
+      if (subscription_status === "active") {
         setHasFreeTrial(true);
       } else {
         setHasFreeTrial(false);
