@@ -374,7 +374,7 @@ const handleSubmitClick = () => {
         setGotoDetail(true);
           setTimeout(() => {
         window.location.reload();
-      }, 1500); // 1.5 second delay to show success message
+      }, 1000); // 1 second delay to show success message
 
       } else {
         dispatch(fetchError(response.data.error));
