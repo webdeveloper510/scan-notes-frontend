@@ -13,6 +13,7 @@ import { NavLink } from 'react-router-dom';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import JWTAuth from 'services/auth/jwt';
 import toast from 'react-hot-toast';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom';
 import { registerUser } from 'services/auth/Basic/api';
 const useStyles = makeStyles(theme => ({
   authThumb: {
@@ -76,7 +77,7 @@ const SignUp = ({ method = CurrentAuthMethod, variant = 'default', wrapperVarian
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const classes = useStyles({ variant });
-
+const History = useHistory();
 const onSubmit = async () => {
   try {
     const res = await registerUser({
@@ -93,7 +94,11 @@ const onSubmit = async () => {
     });
 
     if (res?.success) {
-      toast.success(res.msg || "User registered successfully!");
+      toast.success("Registration successful.");
+      setTimeout(() => {
+        History.push('/signin');
+      }, 1000);
+
     } else {
       toast.error(res?.msg || "Registration failed.");
     }
@@ -101,6 +106,7 @@ const onSubmit = async () => {
     toast.error("Something went wrong.");
   }
 };
+
 
   return (
     <AuthWrapper variant={wrapperVariant}>

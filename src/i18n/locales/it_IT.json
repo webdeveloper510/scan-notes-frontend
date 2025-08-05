@@ -753,8 +753,9 @@
   "subscription.cancelButton": "Annulla abbonamento",
   "subscription.noDataFound": "Nessun dato di abbonamento trovato.",
   "subscription.cancelConfirmation": "Sei sicuro di voler annullare il tuo abbonamento?",
-  "subscription.cancelTitle": "Annulla abbonamento",
+  "subscription.cancelTitle": "Non voglio più usare il foglio di lavoro",
   "subscription.confirmCancel": "Conferma cancellazione",
-"subscription.keepSubscription": "Mantieni abbonamento"
+"subscription.keepSubscription": "Mantieni abbonamento",
+  "subscription.subscribeNow": "Clicco qui perché voglio sbloccare il numero di download"
 
 }

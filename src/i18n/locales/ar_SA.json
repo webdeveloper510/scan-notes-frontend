@@ -755,7 +755,8 @@
   "subscription.cancelButton": "إلغاء الاشتراك",
   "subscription.noDataFound": "لم يتم العثور على بيانات الاشتراك.",
   "subscription.cancelConfirmation": "هل أنت متأكد أنك تريد إلغاء اشتراكك؟",
-  "subscription.cancelTitle": "إلغاء الاشتراك",
+  "subscription.cancelTitle": "لم أعد أرغب في استخدام ورقة العمل",
   "subscription.confirmCancel": "تأكيد الإلغاء",
-  "subscription.keepSubscription": "الاحتفاظ بالاشتراك"
+  "subscription.keepSubscription": "الاحتفاظ بالاشتراك",
+  "subscription.subscribeNow": "أضغط هنا لأنني أريد فتح عدد التنزيلات"
 }

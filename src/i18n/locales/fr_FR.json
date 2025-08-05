@@ -755,8 +755,9 @@
   "subscription.cancelButton": "Annuler l’abonnement",
   "subscription.noDataFound": "Aucune donnée d’abonnement trouvée.",
   "subscription.cancelConfirmation": "Êtes-vous sûr de vouloir annuler votre abonnement ?",
-  "subscription.cancelTitle": "Annuler l'abonnement",
+  "subscription.cancelTitle": "Je ne veux plus utiliser la fiche de travail",
   "subscription.confirmCancel": "Confirmer l’annulation",
-"subscription.keepSubscription": "Conserver l’abonnement"
+"subscription.keepSubscription": "Conserver l’abonnement",
+  "subscription.subscribeNow": "Je clique ici parce que je veux débloquer le nombre de téléchargements"
 
 }

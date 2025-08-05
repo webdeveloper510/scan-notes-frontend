@@ -753,8 +753,9 @@
   "subscription.cancelButton": "Cancelar suscripción",
   "subscription.noDataFound": "No se encontraron datos de suscripción.",
   "subscription.cancelConfirmation": "¿Está seguro de que desea cancelar su suscripción?",
-  "subscription.cancelTitle": "Cancelar suscripción",
+  "subscription.cancelTitle": "Ya no quiero usar la hoja de trabajo",
   "subscription.confirmCancel": "Confirmar cancelación",
-"subscription.keepSubscription": "Mantener suscripción"
+"subscription.keepSubscription": "Mantener suscripción",
+  "subscription.subscribeNow": "Hago clic aquí porque quiero desbloquear la cantidad de descargas"
 
 }

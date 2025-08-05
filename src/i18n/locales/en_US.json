@@ -754,7 +754,8 @@
   "subscription.cancelButton": "Cancel Subscription",
   "subscription.noDataFound": "No subscription data found.",
   "subscription.cancelConfirmation": "Are you sure you want to cancel your subscription?",
-  "subscription.cancelTitle": "Cancel Subscription",
+  "subscription.cancelTitle": "I no longer want to use worksheet",
   "subscription.confirmCancel": "Confirm Cancellation",
-  "subscription.keepSubscription": "Keep Subscription"
+  "subscription.keepSubscription": "Keep Subscription",
+  "subscription.subscribeNow":" I click here because I want to unlock the number of downloads"
 }

@@ -535,11 +535,26 @@ return (
           </div>
         </div>
       ) : (
-        <div className={classes.loadingContainer}>
-          <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '1.125rem' }}>
-            <IntlMessages id="subscription.noDataFound" defaultMessage="No active subscription found." />
-          </p>
-        </div>
+  <div className={classes.loadingContainer} style={{ flexDirection: 'column', gap: 16 }}>
+  <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '1.125rem' }}>
+    <IntlMessages id="subscription.noDataFound" defaultMessage="No active subscription found." />
+  </p>
+
+  <Button
+    variant="contained"
+    style={{
+      backgroundColor: '#facc15',
+      color: '#1e293b',
+      fontWeight: 600,
+      padding: '12px 24px',
+      borderRadius: 8
+    }}
+    onClick={() => window.location.href = '/subscription'} 
+  >
+<IntlMessages id="subscription.subscribeNow" />
+  </Button>
+</div>
+
       )}
     </div>
 
