@@ -758,5 +758,7 @@
   "subscription.cancelTitle": "لم أعد أرغب في استخدام ورقة العمل",
   "subscription.confirmCancel": "تأكيد الإلغاء",
   "subscription.keepSubscription": "الاحتفاظ بالاشتراك",
-  "subscription.subscribeNow": "أضغط هنا لأنني أريد فتح عدد التنزيلات"
+  "subscription.subscribeNow": "أضغط هنا لأنني أريد فتح عدد التنزيلات",
+  "validation.validate": "تم التحقق من الصور بالفعل. يمكنك الانتقال إلى صفحة التفاصيل."
+
 }

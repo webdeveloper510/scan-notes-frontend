@@ -92,8 +92,8 @@
     "typescript": "^3.9.5"
   },
   "scripts": {
-    "start": "set NODE_OPTIONS=--openssl-legacy-provider && set HTTPS=true && react-scripts start",
-    "build": "react-scripts build",
+    "start": "node init && set NODE_OPTIONS=--openssl-legacy-provider && set HTTPS=true && react-scripts start",
+    "build": "node init && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",

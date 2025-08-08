@@ -337,6 +337,14 @@ const handleSubmitClick = () => {
     return;
   }
 
+  // Check if already validated (has solutions)
+  const hasValidatedImages = selectedImageURL.some(img => img.solution || img.source);
+  if (hasValidatedImages) {
+    setMessage(<IntlMessages id="validation.validate" />);
+    setShowMessage(true);
+    return;
+  }
+
   setLoading(true);
 
   const eventData = new FormData();
@@ -361,21 +369,28 @@ const handleSubmitClick = () => {
     .post(`${baseURL}recognize_image/`, eventData)
     .then(response => {
       if (response.data.status === 200) {
-        dispatch(fetchSuccess('Success!'));
-            const responseObjectId = response.data.object_id || response.data.data?.object_id;
+        dispatch(fetchSuccess('success'));
 
+        const responseObjectId = response.data.object_id || response.data.data?.object_id;
         setObjectId(responseObjectId);
-        let newSelectedImageURL = [...selectedImageURL];
-        newSelectedImageURL.forEach((item, index) => {
-          // item.source = response.data.data.sheet_wav_data[index];
-          // item.solution = response.data.data.sheet_music_data[index];
+        
+        // Update the images with solutions instead of reloading
+        let updatedSelectedImageURL = [...selectedImageURL];
+        updatedSelectedImageURL.forEach((item, index) => {
+          // if (response.data.data.sheet_wav_data && response.data.data.sheet_wav_data[index]) {
+          //   item.source = response.data.data.sheet_wav_data[index];
+          // }
+          // if (response.data.data.sheet_music_data && response.data.data.sheet_music_data[index]) {
+          //   item.solution = response.data.data.sheet_music_data[index];
+          // }
+          // Mark as validated
+          item.isValidated = true;
         });
-        setSelectedImageURL(newSelectedImageURL);
+        
+        setSelectedImageURL(updatedSelectedImageURL);
         setGotoDetail(true);
-          setTimeout(() => {
-        window.location.reload();
-      }, 50); // 50ms delay to show success message
-
+        setShowMessage(true);
+        
       } else {
         dispatch(fetchError(response.data.error));
       }
@@ -1032,234 +1047,259 @@ const handleScanButtonClick = async () => {
   const handleScanClose = () => {
     setOpenScan(false);
   };
-
-  return (
-    <PageContainer heading={<IntlMessages id="sidebar.dashboard" />} breadcrumbs={breadcrumbs}>
-      <GridContainer>
-        <Grid item xs={12}>
-          <GridContainer>
-            {/* Control buttons */}
-         <Grid item xs={12}>
-  <div className={classes.controlsSection}>
-    {!isComingFromHistory() && (
-      <>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={e => {
-            document.getElementById('photo_img').click();
-          }}
-          disabled={loading}
-          startIcon={<CloudUpload />}>
-         <IntlMessages id="dashboard.upload" />
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleScanButtonClick()}
-          disabled={loading}
-          startIcon={<PhotoCamera />}>
-         <IntlMessages id="dashboard.scan" />
-        </Button>
-      </>
-    )}
-    {/* Always show zoom controls */}
-    <IconButton color="secondary" onClick={() => handleZoomInClick()}>
-      <ZoomIn />
-    </IconButton>
-    <IconButton color="secondary" onClick={() => handleZoomOutClick()}>
-      <ZoomOut />
-    </IconButton>
-    <IconButton color="secondary" onClick={() => handleZoomOutMapClick()}>
-      <ZoomOutMap />
-    </IconButton>
-    <IconButton color={zoomFocus ? 'secondary' : 'primary'} onClick={() => handleZoomFocusClick()}>
-      <CenterFocusStrong />
-    </IconButton>
-  </div>
-</Grid>
-            {/* Main content with side-by-side layout */}
-            <Grid item xs={12}>
-              <div className={classes.mainLayout}>
-                {/* Selected images section - now on the left */}
-                <div className={classes.selectedImagesSection}>
-                  {selectedImageURL.length > 0 && (
-                    <>
-                      <Box className={classes.sectionTitle} style={{ marginBottom: '8px' }}>
-                        <Typography variant="h6">
-                          <IntlMessages id="dashboard.imageTitle" />
-                        </Typography>
-                      </Box>
-                      <CmtCard>
-                        <CmtCardContent>
-                          <PerfectScrollbar>
-                            {selectedImageURL.map(img => (
-                              <div
-                                key={img.id}
-                                className={clsx(
-                                  classes.selectedImageItem,
-                                  dragOverItem && dragOverItem.id === img.id && classes.draggedOver,
-                                  draggedItem && draggedItem.id === img.id && classes.beingDragged,
+return (
+  <PageContainer heading={<IntlMessages id="sidebar.dashboard" />} breadcrumbs={breadcrumbs}>
+    <GridContainer>
+      <Grid item xs={12}>
+        <GridContainer>
+          {/* Control buttons - Hide after validation */}
+          {(() => {
+            const hasValidatedImages = selectedImageURL.some(img => img.isValidated || img.solution || img.source);
+            
+            return (
+              <>
+                {!hasValidatedImages && (
+                  <Grid item xs={12}>
+                    <div className={classes.controlsSection}>
+                      {!isComingFromHistory() && (
+                        <>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={e => {
+                              document.getElementById('photo_img').click();
+                            }}
+                            disabled={loading}
+                            startIcon={<CloudUpload />}>
+                           <IntlMessages id="dashboard.upload" />
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleScanButtonClick()}
+                            disabled={loading}
+                            startIcon={<PhotoCamera />}>
+                           <IntlMessages id="dashboard.scan" />
+                          </Button>
+                        </>
+                      )}
+                      {/* Always show zoom controls when not validated */}
+                      <IconButton color="secondary" onClick={() => handleZoomInClick()}>
+                        <ZoomIn />
+                      </IconButton>
+                      <IconButton color="secondary" onClick={() => handleZoomOutClick()}>
+                        <ZoomOut />
+                      </IconButton>
+                      <IconButton color="secondary" onClick={() => handleZoomOutMapClick()}>
+                        <ZoomOutMap />
+                      </IconButton>
+                      <IconButton color={zoomFocus ? 'secondary' : 'primary'} onClick={() => handleZoomFocusClick()}>
+                        <CenterFocusStrong />
+                      </IconButton>
+                    </div>
+                  </Grid>
+                )}
+                
+                {/* Main content with side-by-side layout */}
+                <Grid item xs={12}>
+                  <div className={classes.mainLayout}>
+                    {/* Selected images section - always visible */}
+                    <div className={classes.selectedImagesSection}>
+                      {selectedImageURL.length > 0 && (
+                        <>
+                          <Box className={classes.sectionTitle} style={{ marginBottom: '8px' }}>
+                            <Typography variant="h6">
+                              <IntlMessages id="dashboard.imageTitle" />
+                            </Typography>
+                          </Box>
+                          <CmtCard>
+                            <CmtCardContent>
+                              <PerfectScrollbar>
+                                {selectedImageURL.map(img => (
+                                  <div
+                                    key={img.id}
+                                    className={clsx(
+                                      classes.selectedImageItem,
+                                      // Disable drag and drop after validation
+                                      !hasValidatedImages && dragOverItem && dragOverItem.id === img.id && classes.draggedOver,
+                                      !hasValidatedImages && draggedItem && draggedItem.id === img.id && classes.beingDragged,
+                                    )}
+                                    draggable={!hasValidatedImages} // Disable drag after validation
+                                    onDragStart={!hasValidatedImages ? (e => handleDragStart(e, img)) : undefined}
+                                    onDragOver={!hasValidatedImages ? (e => handleDragOver(e, img)) : undefined}
+                                    onDragEnter={!hasValidatedImages ? handleDragEnter : undefined}
+                                    onDragLeave={!hasValidatedImages ? handleDragLeave : undefined}
+                                    onDrop={!hasValidatedImages ? (e => handleDrop(e, img)) : undefined}
+                                    onDragEnd={!hasValidatedImages ? handleDragEnd : undefined}>
+                                    <div className={classes.selectedImageThumbnail}>
+                                      <CmtImage
+                                        src={img.image}
+                                        style={{
+                                          height: '60px',
+                                          objectFit: 'cover',
+                                          border: '1px solid #ddd',
+                                          borderRadius: '4px',
+                                        }}
+                                      />
+                                    </div>
+                                    <div className={classes.selectedImageSolution}>
+                                      {img.solution ? (
+                                        <Typography variant="body2">{img.solution}</Typography>
+                                      ) : (
+                                        <Typography variant="body2" color="textSecondary"></Typography>
+                                      )}
+                                      {currentMidi && currentMidi === img.id && img.source && (
+                                        <audio
+                                          src={`${mediaURL}${img.source}`}
+                                          controls
+                                          autoPlay={img.id === currentMidi}
+                                          style={{ width: '100%', marginTop: '8px' }}
+                                        />
+                                      )}
+                                    </div>
+                                    <div className={classes.selectedImageActions}>
+                                      {img.source && (
+                                        <IconButton size="small" color="primary" onClick={() => handlePlayMidi(img.id)}>
+                                          {img.id === currentMidi ? <Stop /> : <PlayArrow />}
+                                        </IconButton>
+                                      )}
+                                      {/* Only show delete button if not validated or allow deletion for history items */}
+                                      {(!hasValidatedImages || img.isFromHistory) && (
+                                        <IconButton size="small" color="secondary" onClick={() => handleDeleteImage(img.id)}>
+                                          <Delete />
+                                        </IconButton>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </PerfectScrollbar>
+                              <Box mt={2}>
+                                {/* Show submit button only if not validated */}
+                                {!hasValidatedImages && (
+                                  <Button
+                                    variant="contained"
+                                    color="primary"
+                                    fullWidth
+                                    onClick={handleSubmitClick}
+                                    disabled={loading || selectedImageURL.length === 0}
+                                    startIcon={<Send />}
+                                    style={{ marginBottom: '8px' }}>
+                                    <IntlMessages id="dashboard.submit" />
+                                  </Button>
                                 )}
-                                draggable
-                                onDragStart={e => handleDragStart(e, img)}
-                                onDragOver={e => handleDragOver(e, img)}
-                                onDragEnter={handleDragEnter}
-                                onDragLeave={handleDragLeave}
-                                onDrop={e => handleDrop(e, img)}
-                                onDragEnd={handleDragEnd}>
-                                <div className={classes.selectedImageThumbnail}>
-                                  <CmtImage
-                                    src={img.image}
-                                    style={{
-                                      height: '60px',
-                                      objectFit: 'cover',
-                                      border: '1px solid #ddd',
-                                      borderRadius: '4px',
-                                    }}
-                                  />
-                                </div>
-                                <div className={classes.selectedImageSolution}>
-                                  {img.solution ? (
-                                    <Typography variant="body2">{img.solution}</Typography>
-                                  ) : (
-                                    <Typography variant="body2" color="textSecondary"></Typography>
-                                  )}
-                                  {currentMidi && currentMidi === img.id && img.source && (
-                                    <audio
-                                      src={`${mediaURL}${img.source}`}
-                                      controls
-                                      autoPlay={img.id === currentMidi}
-                                      style={{ width: '100%', marginTop: '8px' }}
-                                    />
-                                  )}
-                                </div>
-                                <div className={classes.selectedImageActions}>
-                                  {img.source && (
-                                    <IconButton size="small" color="primary" onClick={() => handlePlayMidi(img.id)}>
-                                      {img.id === currentMidi ? <Stop /> : <PlayArrow />}
-                                    </IconButton>
-                                  )}
-                                  <IconButton size="small" color="secondary" onClick={() => handleDeleteImage(img.id)}>
-                                    <Delete />
-                                  </IconButton>
-                                </div>
-                              </div>
-                            ))}
-                          </PerfectScrollbar>
-                          <Box mt={2}>
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              fullWidth
-                              onClick={handleSubmitClick}
-                              disabled={loading || selectedImageURL.length === 0}
-                              startIcon={<Send />}
-                              style={{ marginBottom: '8px' }}>
-                              <IntlMessages id="dashboard.submit" />
+                                
+                                {/* Show "Go to Detail" button - prominent after validation */}
+                                <Button
+                                  variant={hasValidatedImages ? "contained" : "outlined"}
+                                  color="primary"
+                                  fullWidth
+                                  onClick={handleGotoDetailClick}
+                                  disabled={!gotoDetail}
+                                  size={hasValidatedImages ? "large" : "medium"}>
+                                  <IntlMessages id="dashboard.goto" />
+                                </Button>
+                              </Box>
+                            </CmtCardContent>
+                          </CmtCard>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Canvas section - Hide after validation */}
+                    {!hasValidatedImages && (
+                      <div className={classes.canvasSection}>
+                        <Box mb={2} style={{ textAlign: 'center' }}>
+                          <Typography variant="h6">
+                            <IntlMessages id="dashboard.sheet" />
+                          </Typography>
+                        </Box>
+                        <input
+                          type="file"
+                          id="photo_img"
+                          name="photo_img"
+                          style={{ display: 'none' }}
+                          onChange={event => handleFileInputChange(event.target.files[0])}
+                        />
+                        <div
+                          style={{
+                            width: '100%',
+                            maxHeight: '800px',
+                            overflow: 'auto',
+                            display: 'flex',
+                            justifyContent: 'flex-start',
+                            marginTop: '10px',
+                          }}
+                          className={clsx(classes.imageContainer)}
+                          id="image-container">
+                          <canvas
+                            ref={canvasRef}
+                            onMouseDown={handleMouseDown}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseUp}
+                            style={{ maxWidth: '100%', height: 'auto', left: 0, top: 0, marginLeft: '8px' }}
+                            id="myCanvas"
+                          />
+                          <div className={clsx(classes.enlargedImage)} id="enlarged-image"></div>
+                        </div>
+                        {numPages ? (
+                          <Box mt={2} style={{ textAlign: 'center' }}>
+                            <Button variant="contained" size="small" color="secondary" onClick={handlePrevClick}>
+                              Prev
                             </Button>
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              fullWidth
-                              onClick={handleGotoDetailClick}
-                              disabled={!gotoDetail}>
-                              <IntlMessages id="dashboard.goto" />
+                            <span style={{ margin: '0 16px' }}>
+                              Page {currentPage} of {numPages}
+                            </span>
+                            <Button variant="contained" size="small" color="secondary" onClick={handleNextClick}>
+                              Next
                             </Button>
                           </Box>
-                        </CmtCardContent>
-                      </CmtCard>
-                    </>
-                  )}
-                </div>
-                {/* Canvas section - now on the right */}
-                <div className={classes.canvasSection}>
-                  <Box mb={2} style={{ textAlign: 'center' }}>
-                    <Typography variant="h6">
-                      <IntlMessages id="dashboard.sheet" />
-                    </Typography>
-                  </Box>
-                  <input
-                    type="file"
-                    id="photo_img"
-                    name="photo_img"
-                    style={{ display: 'none' }}
-                    onChange={event => handleFileInputChange(event.target.files[0])}
-                  />
-                  <div
-                    style={{
-                      width: '100%',
-                      maxHeight: '800px',
-                      overflow: 'auto',
-                      display: 'flex',
-                      justifyContent: 'flex-start',
-                      marginTop: '10px',
-                    }}
-                    className={clsx(classes.imageContainer)}
-                    id="image-container">
-                    <canvas
-                      ref={canvasRef}
-                      onMouseDown={handleMouseDown}
-                      onMouseMove={handleMouseMove}
-                      onMouseUp={handleMouseUp}
-                      style={{ maxWidth: '100%', height: 'auto', left: 0, top: 0, marginLeft: '8px' }}
-                      id="myCanvas"
-                    />
-                    <div className={clsx(classes.enlargedImage)} id="enlarged-image"></div>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
-                  {numPages ? (
-                    <Box mt={2} style={{ textAlign: 'center' }}>
-                      <Button variant="contained" size="small" color="secondary" onClick={handlePrevClick}>
-                        Prev
-                      </Button>
-                      <span style={{ margin: '0 16px' }}>
-                        Page {currentPage} of {numPages}
-                      </span>
-                      <Button variant="contained" size="small" color="secondary" onClick={handleNextClick}>
-                        Next
-                      </Button>
-                    </Box>
-                  ) : null}
-                </div>
-              </div>
-            </Grid>
-          </GridContainer>
-        </Grid>
-      </GridContainer>
+                </Grid>
+              </>
+            );
+          })()}
+        </GridContainer>
+      </Grid>
+    </GridContainer>
 
-      <Dialog fullScreen={fullScreen} open={open_scan} onClose={handleScanClose} aria-labelledby="responsive-dialog-title">
-        <DialogTitle id="responsive-dialog-title">{'Take a sheet music with a camera'}</DialogTitle>
-        <DialogContent>
-          <video ref={videoRef} />
-          <canvas ref={canvasScanRef} style={{ display: 'none' }} />
-        </DialogContent>
-        <DialogActions>
-          <Button autoFocus onClick={handleScanClose} color="primary">
-            Close
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleCaptureButtonClick}>
-            Capture
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={showSubscriptionDialog} onClose={() => setShowSubscriptionDialog(false)} maxWidth="sm" fullWidth>
-        <DialogContent>
-          <Typography variant="body1" gutterBottom>
-           <IntlMessages id="dashboard.freeTrial" />
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowSubscriptionDialog(false)} color="primary">
-            <IntlMessages id="dashboard.cancel" />
-          </Button>
-          <Button onClick={handleSubscriptionRedirect} color="primary" variant="contained">
-            <IntlMessages id="dashboard.buysubscription" />
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {showMessage && <ToastMessage open={showMessage} onClose={handleMessageClose()} message={message} />}
-    </PageContainer>
-  );
+    <Dialog fullScreen={fullScreen} open={open_scan} onClose={handleScanClose} aria-labelledby="responsive-dialog-title">
+      <DialogTitle id="responsive-dialog-title">{'Take a sheet music with a camera'}</DialogTitle>
+      <DialogContent>
+        <video ref={videoRef} />
+        <canvas ref={canvasScanRef} style={{ display: 'none' }} />
+      </DialogContent>
+      <DialogActions>
+        <Button autoFocus onClick={handleScanClose} color="primary">
+          Close
+        </Button>
+        <Button variant="contained" color="primary" onClick={handleCaptureButtonClick}>
+          Capture
+        </Button>
+      </DialogActions>
+    </Dialog>
+    
+    <Dialog open={showSubscriptionDialog} onClose={() => setShowSubscriptionDialog(false)} maxWidth="sm" fullWidth>
+      <DialogContent>
+        <Typography variant="body1" gutterBottom>
+         <IntlMessages id="dashboard.freeTrial" />
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setShowSubscriptionDialog(false)} color="primary">
+          <IntlMessages id="dashboard.cancel" />
+        </Button>
+        <Button onClick={handleSubscriptionRedirect} color="primary" variant="contained">
+          <IntlMessages id="dashboard.buysubscription" />
+        </Button>
+      </DialogActions>
+    </Dialog>
+    
+    {showMessage && <ToastMessage open={showMessage} onClose={handleMessageClose()} message={message} />}
+  </PageContainer>
+);
 };
 
 export default DashBoard;
