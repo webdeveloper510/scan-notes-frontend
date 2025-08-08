@@ -756,6 +756,6 @@
   "subscription.cancelTitle": "Non voglio più usare il foglio di lavoro",
   "subscription.confirmCancel": "Conferma cancellazione",
 "subscription.keepSubscription": "Mantieni abbonamento",
-  "subscription.subscribeNow": "Clicco qui perché voglio sbloccare il numero di download"
-
+  "subscription.subscribeNow": "Clicco qui perché voglio sbloccare il numero di download",
+  "validation.validate": "Le immagini sono già state convalidate. Puoi andare alla pagina dei dettagli."
 }

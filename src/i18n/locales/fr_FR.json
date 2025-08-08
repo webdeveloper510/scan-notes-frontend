@@ -758,6 +758,6 @@
   "subscription.cancelTitle": "Je ne veux plus utiliser la fiche de travail",
   "subscription.confirmCancel": "Confirmer l’annulation",
 "subscription.keepSubscription": "Conserver l’abonnement",
-  "subscription.subscribeNow": "Je clique ici parce que je veux débloquer le nombre de téléchargements"
-
+  "subscription.subscribeNow": "Je clique ici parce que je veux débloquer le nombre de téléchargements",
+  "validation.validate": "Les images sont déjà validées. Vous pouvez aller à la page de détails."
 }

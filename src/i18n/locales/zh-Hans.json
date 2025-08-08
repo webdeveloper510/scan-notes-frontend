@@ -756,5 +756,7 @@
   "subscription.cancelTitle": "我不再想使用工作表",
   "subscription.confirmCancel": "确认取消",
 "subscription.keepSubscription": "保留订阅",
-  "subscription.subscribeNow": "我点击这里是因为我想解锁下载次数"
+  "subscription.subscribeNow": "我点击这里是因为我想解锁下载次数",
+  "validation.validate": "图像已验证。您可以前往详情页面。"
+
 }

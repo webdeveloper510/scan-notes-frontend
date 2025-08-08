@@ -756,6 +756,6 @@
   "subscription.cancelTitle": "Ya no quiero usar la hoja de trabajo",
   "subscription.confirmCancel": "Confirmar cancelación",
 "subscription.keepSubscription": "Mantener suscripción",
-  "subscription.subscribeNow": "Hago clic aquí porque quiero desbloquear la cantidad de descargas"
-
+  "subscription.subscribeNow": "Hago clic aquí porque quiero desbloquear la cantidad de descargas",
+  "validation.validate": "Las imágenes ya están validadas. Puedes ir a la página de detalles."
 }

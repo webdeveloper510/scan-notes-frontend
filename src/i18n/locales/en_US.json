@@ -757,5 +757,6 @@
   "subscription.cancelTitle": "I no longer want to use worksheet",
   "subscription.confirmCancel": "Confirm Cancellation",
   "subscription.keepSubscription": "Keep Subscription",
-  "subscription.subscribeNow":" I click here because I want to unlock the number of downloads"
+  "subscription.subscribeNow":" I click here because I want to unlock the number of downloads",
+  "validation.validate":"Images are already validated. You can go to detail page."
 }
